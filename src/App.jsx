@@ -500,6 +500,60 @@ const QRPresets = [
       markerCenterOptions: { color: "#8B5CF6", type: "circle" },
     },
   },
+  {
+    id: "frame-classic",
+    name: "Classic Frame",
+    style: {
+      type: "square",
+      dotsOptions: { type: "square", color: "#000000" },
+      cornerSquareOptions: { type: "square", color: "#000000" },
+      cornerDotOptions: { type: "square", color: "#000000" },
+      backgroundColor: "#FFFFFF",
+      frame: {
+        enabled: true,
+        text: "Scan me",
+        color: "#000000",
+        textColor: "#000000",
+        font: "Inter",
+      },
+    },
+  },
+  {
+    id: "frame-modern",
+    name: "Modern Frame",
+    style: {
+      type: "dots",
+      dotsOptions: { type: "dots", color: "#4F46E5" },
+      cornerSquareOptions: { type: "extra-rounded", color: "#4F46E5" },
+      cornerDotOptions: { type: "dot", color: "#4F46E5" },
+      backgroundColor: "#F3F4F6",
+      frame: {
+        enabled: true,
+        text: "Scan to learn more",
+        color: "#4F46E5",
+        textColor: "#FFFFFF",
+        font: "Poppins",
+      },
+    },
+  },
+  {
+    id: "frame-minimal",
+    name: "Minimal Frame",
+    style: {
+      type: "rounded",
+      dotsOptions: { type: "rounded", color: "#374151" },
+      cornerSquareOptions: { type: "extra-rounded", color: "#374151" },
+      cornerDotOptions: { type: "dot", color: "#374151" },
+      backgroundColor: "#FFFFFF",
+      frame: {
+        enabled: true,
+        text: "Scan QR Code",
+        color: "#F3F4F6",
+        textColor: "#374151",
+        font: "system-ui",
+      },
+    },
+  },
 ];
 
 const StyleOption = ({ selected, onClick, children, style }) => (
@@ -571,6 +625,7 @@ const CustomStyleForm = ({ style, onChange }) => {
   const [sectionsOpen, setSectionsOpen] = useState({
     colors: true,
     patterns: true,
+    frame: true,
   });
 
   const toggleSection = (section) => {
@@ -617,6 +672,15 @@ const CustomStyleForm = ({ style, onChange }) => {
       };
     }
 
+    onChange(newStyle);
+  };
+
+  const handleFrameChange = (key, value) => {
+    const newStyle = { ...style };
+    newStyle.frame = {
+      ...newStyle.frame,
+      [key]: value,
+    };
     onChange(newStyle);
   };
 
@@ -787,6 +851,98 @@ const CustomStyleForm = ({ style, onChange }) => {
           </div>
         )}
       </div>
+
+      {/* Frame Section */}
+      <div className="border rounded-lg overflow-hidden">
+        <button
+          onClick={() => toggleSection("frame")}
+          className="w-full px-4 py-2 bg-gray-50 hover:bg-gray-100 flex justify-between items-center"
+        >
+          <h3 className="text-sm font-medium text-gray-700">Frame</h3>
+          <svg
+            className={`w-5 h-5 transform transition-transform ${
+              sectionsOpen.frame ? "rotate-180" : ""
+            }`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </button>
+        {sectionsOpen.frame && (
+          <div className="p-4 space-y-4">
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="frame-enabled"
+                checked={style.frame?.enabled || false}
+                onChange={(e) => handleFrameChange("enabled", e.target.checked)}
+                className="h-4 w-4 text-blue-500 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <label
+                htmlFor="frame-enabled"
+                className="ml-2 block text-sm text-gray-700"
+              >
+                Enable Frame
+              </label>
+            </div>
+
+            {style.frame?.enabled && (
+              <>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Frame Text
+                  </label>
+                  <input
+                    type="text"
+                    value={style.frame?.text || ""}
+                    onChange={(e) => handleFrameChange("text", e.target.value)}
+                    placeholder="Enter frame text"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <ColorPicker
+                    label="Frame Color"
+                    color={style.frame?.color || "#000000"}
+                    onChange={(color) => handleFrameChange("color", color)}
+                  />
+                  <ColorPicker
+                    label="Text Color"
+                    color={style.frame?.textColor || "#000000"}
+                    onChange={(color) => handleFrameChange("textColor", color)}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Font Family
+                  </label>
+                  <select
+                    value={style.frame?.font || "system-ui"}
+                    onChange={(e) => handleFrameChange("font", e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="system-ui">System UI</option>
+                    <option value="Inter">Inter</option>
+                    <option value="Poppins">Poppins</option>
+                    <option value="Roboto">Roboto</option>
+                    <option value="Arial">Arial</option>
+                    <option value="Helvetica">Helvetica</option>
+                  </select>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
@@ -887,6 +1043,28 @@ const QRGenerator = () => {
 
       qr.append(qrRef.current);
       qrCodeRef.current = qrRef.current.querySelector("canvas");
+
+      // Add frame if enabled
+      if (qrStyle.frame?.enabled) {
+        const frameContainer = document.createElement("div");
+        frameContainer.className = "relative";
+        qrRef.current.appendChild(frameContainer);
+
+        const frame = document.createElement("div");
+        frame.className =
+          "absolute inset-0 border-8 rounded-xl flex items-end justify-center pb-2";
+        frame.style.borderColor = qrStyle.frame.color || "#000000";
+        frame.style.fontFamily = qrStyle.frame.font || "system-ui";
+
+        const text = document.createElement("div");
+        text.className = "px-4 py-1 rounded-full text-sm font-medium";
+        text.style.backgroundColor = qrStyle.frame.color || "#000000";
+        text.style.color = qrStyle.frame.textColor || "#FFFFFF";
+        text.textContent = qrStyle.frame.text || "Scan me";
+
+        frame.appendChild(text);
+        frameContainer.appendChild(frame);
+      }
     }
   }, [debouncedQrData, qrStyle]);
 
