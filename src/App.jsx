@@ -343,6 +343,8 @@ const QRPresets = [
       cornerSquareOptions: { type: "square", color: "#000000" },
       cornerDotOptions: { type: "square", color: "#000000" },
       backgroundColor: "#FFFFFF",
+      markerBorderOptions: { color: "#000000", width: 2, style: "solid" },
+      markerCenterOptions: { color: "#000000", type: "square" },
     },
   },
   {
@@ -354,6 +356,8 @@ const QRPresets = [
       cornerSquareOptions: { type: "extra-rounded", color: "#5856D6" },
       cornerDotOptions: { type: "dot", color: "#007AFF" },
       backgroundColor: "#FFFFFF",
+      markerBorderOptions: { color: "#5856D6", width: 3, style: "double" },
+      markerCenterOptions: { color: "#FF3B30", type: "circle" },
     },
   },
   {
@@ -444,9 +448,74 @@ const QRPresets = [
       backgroundColor: "#111827",
     },
   },
+  {
+    id: "bordered-classic",
+    name: "Bordered Classic",
+    style: {
+      type: "square",
+      dotsOptions: { type: "square", color: "#000000" },
+      cornerSquareOptions: { type: "square", color: "#000000" },
+      cornerDotOptions: { type: "square", color: "#000000" },
+      backgroundColor: "#FFFFFF",
+      markerBorderOptions: { color: "#000000", width: 4, style: "double" },
+      markerCenterOptions: { color: "#000000", type: "extra-rounded" },
+    },
+  },
+  {
+    id: "dotted-elegant",
+    name: "Dotted Elegant",
+    style: {
+      type: "dots",
+      dotsOptions: { type: "dots", color: "#4A5568" },
+      cornerSquareOptions: { type: "extra-rounded", color: "#2D3748" },
+      cornerDotOptions: { type: "dot", color: "#1A202C" },
+      backgroundColor: "#FFFFFF",
+      markerBorderOptions: { color: "#2D3748", width: 2, style: "dotted" },
+      markerCenterOptions: { color: "#4A5568", type: "circle" },
+    },
+  },
+  {
+    id: "dashed-modern",
+    name: "Dashed Modern",
+    style: {
+      type: "rounded",
+      dotsOptions: { type: "rounded", color: "#3B82F6" },
+      cornerSquareOptions: { type: "extra-rounded", color: "#2563EB" },
+      cornerDotOptions: { type: "dot", color: "#1D4ED8" },
+      backgroundColor: "#EFF6FF",
+      markerBorderOptions: { color: "#2563EB", width: 3, style: "dashed" },
+      markerCenterOptions: { color: "#3B82F6", type: "diamond" },
+    },
+  },
+  {
+    id: "fancy-borders",
+    name: "Fancy Borders",
+    style: {
+      type: "classy-rounded",
+      dotsOptions: { type: "classy-rounded", color: "#8B5CF6" },
+      cornerSquareOptions: { type: "extra-rounded", color: "#7C3AED" },
+      cornerDotOptions: { type: "dot", color: "#6D28D9" },
+      backgroundColor: "#F5F3FF",
+      markerBorderOptions: { color: "#7C3AED", width: 3, style: "double" },
+      markerCenterOptions: { color: "#8B5CF6", type: "circle" },
+    },
+  },
 ];
 
 const CustomStyleForm = ({ style, onChange }) => {
+  const [sectionsOpen, setSectionsOpen] = useState({
+    colors: true,
+    patterns: true,
+    markers: true,
+  });
+
+  const toggleSection = (section) => {
+    setSectionsOpen((prev) => ({
+      ...prev,
+      [section]: !prev[section],
+    }));
+  };
+
   const handleChange = (key, value) => {
     onChange({ ...style, [key]: value });
   };
@@ -460,97 +529,279 @@ const CustomStyleForm = ({ style, onChange }) => {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-4">
-        <h3 className="text-sm font-medium text-gray-700">Colors</h3>
-        <div className="grid grid-cols-1 gap-4">
-          <ColorPicker
-            label="Background"
-            color={style.backgroundColor}
-            onChange={(color) => handleChange("backgroundColor", color)}
-          />
-          <ColorPicker
-            label="Dots"
-            color={style.dotsOptions.color}
-            onChange={(color) =>
-              handleNestedChange("dotsOptions", "color", color)
-            }
-          />
-          <ColorPicker
-            label="Corner Squares"
-            color={style.cornerSquareOptions.color}
-            onChange={(color) =>
-              handleNestedChange("cornerSquareOptions", "color", color)
-            }
-          />
-          <ColorPicker
-            label="Corner Dots"
-            color={style.cornerDotOptions.color}
-            onChange={(color) =>
-              handleNestedChange("cornerDotOptions", "color", color)
-            }
-          />
-        </div>
+      {/* Colors Section */}
+      <div className="border rounded-lg overflow-hidden">
+        <button
+          onClick={() => toggleSection("colors")}
+          className="w-full px-4 py-2 bg-gray-50 hover:bg-gray-100 flex justify-between items-center"
+        >
+          <h3 className="text-sm font-medium text-gray-700">Colors</h3>
+          <svg
+            className={`w-5 h-5 transform transition-transform ${
+              sectionsOpen.colors ? "rotate-180" : ""
+            }`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </button>
+        {sectionsOpen.colors && (
+          <div className="p-4 space-y-4">
+            <div className="grid grid-cols-1 gap-4">
+              <ColorPicker
+                label="Background"
+                color={style.backgroundColor}
+                onChange={(color) => handleChange("backgroundColor", color)}
+              />
+              <ColorPicker
+                label="Dots"
+                color={style.dotsOptions.color}
+                onChange={(color) =>
+                  handleNestedChange("dotsOptions", "color", color)
+                }
+              />
+              <ColorPicker
+                label="Corner Squares"
+                color={style.cornerSquareOptions.color}
+                onChange={(color) =>
+                  handleNestedChange("cornerSquareOptions", "color", color)
+                }
+              />
+              <ColorPicker
+                label="Corner Dots"
+                color={style.cornerDotOptions.color}
+                onChange={(color) =>
+                  handleNestedChange("cornerDotOptions", "color", color)
+                }
+              />
+              <ColorPicker
+                label="Marker Border"
+                color={style.markerBorderOptions?.color || "#000000"}
+                onChange={(color) =>
+                  handleNestedChange("markerBorderOptions", "color", color)
+                }
+              />
+              <ColorPicker
+                label="Marker Center"
+                color={style.markerCenterOptions?.color || "#000000"}
+                onChange={(color) =>
+                  handleNestedChange("markerCenterOptions", "color", color)
+                }
+              />
+            </div>
+          </div>
+        )}
       </div>
 
-      <div className="space-y-4">
-        <h3 className="text-sm font-medium text-gray-700">Patterns</h3>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Dots Style
-            </label>
-            <select
-              value={style.dotsOptions.type}
-              onChange={(e) =>
-                handleNestedChange("dotsOptions", "type", e.target.value)
-              }
-              className="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="square">Square</option>
-              <option value="dots">Dots</option>
-              <option value="rounded">Rounded</option>
-              <option value="classy">Classy</option>
-              <option value="classy-rounded">Classy Rounded</option>
-            </select>
-          </div>
+      {/* Patterns Section */}
+      <div className="border rounded-lg overflow-hidden">
+        <button
+          onClick={() => toggleSection("patterns")}
+          className="w-full px-4 py-2 bg-gray-50 hover:bg-gray-100 flex justify-between items-center"
+        >
+          <h3 className="text-sm font-medium text-gray-700">Patterns</h3>
+          <svg
+            className={`w-5 h-5 transform transition-transform ${
+              sectionsOpen.patterns ? "rotate-180" : ""
+            }`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </button>
+        {sectionsOpen.patterns && (
+          <div className="p-4 space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Dots Style
+              </label>
+              <select
+                value={style.dotsOptions.type}
+                onChange={(e) =>
+                  handleNestedChange("dotsOptions", "type", e.target.value)
+                }
+                className="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="square">Square</option>
+                <option value="dots">Dots</option>
+                <option value="rounded">Rounded</option>
+                <option value="classy">Classy</option>
+                <option value="classy-rounded">Classy Rounded</option>
+              </select>
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Corner Squares Style
-            </label>
-            <select
-              value={style.cornerSquareOptions.type}
-              onChange={(e) =>
-                handleNestedChange(
-                  "cornerSquareOptions",
-                  "type",
-                  e.target.value
-                )
-              }
-              className="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="square">Square</option>
-              <option value="dot">Dots</option>
-              <option value="extra-rounded">Extra Rounded</option>
-            </select>
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Marker Border Style
+              </label>
+              <select
+                value={style.markerBorderOptions?.style || "solid"}
+                onChange={(e) =>
+                  handleNestedChange(
+                    "markerBorderOptions",
+                    "style",
+                    e.target.value
+                  )
+                }
+                className="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="solid">Solid</option>
+                <option value="double">Double</option>
+                <option value="dotted">Dotted</option>
+                <option value="dashed">Dashed</option>
+              </select>
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Corner Dots Style
-            </label>
-            <select
-              value={style.cornerDotOptions.type}
-              onChange={(e) =>
-                handleNestedChange("cornerDotOptions", "type", e.target.value)
-              }
-              className="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="square">Square</option>
-              <option value="dot">Dots</option>
-            </select>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Marker Border Width
+              </label>
+              <input
+                type="range"
+                min="1"
+                max="5"
+                value={style.markerBorderOptions?.width || 2}
+                onChange={(e) =>
+                  handleNestedChange(
+                    "markerBorderOptions",
+                    "width",
+                    parseInt(e.target.value)
+                  )
+                }
+                className="w-full"
+              />
+              <div className="text-sm text-gray-500 mt-1">
+                Width: {style.markerBorderOptions?.width || 2}px
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Marker Center Style
+              </label>
+              <select
+                value={style.markerCenterOptions?.type || "square"}
+                onChange={(e) =>
+                  handleNestedChange(
+                    "markerCenterOptions",
+                    "type",
+                    e.target.value
+                  )
+                }
+                className="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="square">Square</option>
+                <option value="circle">Circle</option>
+                <option value="diamond">Diamond</option>
+                <option value="extra-rounded">Extra Rounded</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Corner Squares Style
+              </label>
+              <select
+                value={style.cornerSquareOptions.type}
+                onChange={(e) =>
+                  handleNestedChange(
+                    "cornerSquareOptions",
+                    "type",
+                    e.target.value
+                  )
+                }
+                className="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="square">Square</option>
+                <option value="dot">Dots</option>
+                <option value="extra-rounded">Extra Rounded</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Corner Dots Style
+              </label>
+              <select
+                value={style.cornerDotOptions.type}
+                onChange={(e) =>
+                  handleNestedChange("cornerDotOptions", "type", e.target.value)
+                }
+                className="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="square">Square</option>
+                <option value="dot">Dots</option>
+              </select>
+            </div>
           </div>
-        </div>
+        )}
+      </div>
+
+      {/* Markers Section */}
+      <div className="border rounded-lg overflow-hidden">
+        <button
+          onClick={() => toggleSection("markers")}
+          className="w-full px-4 py-2 bg-gray-50 hover:bg-gray-100 flex justify-between items-center"
+        >
+          <h3 className="text-sm font-medium text-gray-700">Markers</h3>
+          <svg
+            className={`w-5 h-5 transform transition-transform ${
+              sectionsOpen.markers ? "rotate-180" : ""
+            }`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </button>
+        {sectionsOpen.markers && (
+          <div className="p-4 space-y-4">
+            {/* Marker Border Style */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Marker Border Style
+              </label>
+              <select
+                value={style.markerBorderOptions?.style || "solid"}
+                onChange={(e) =>
+                  handleNestedChange(
+                    "markerBorderOptions",
+                    "style",
+                    e.target.value
+                  )
+                }
+                className="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="solid">Solid</option>
+                <option value="double">Double</option>
+                <option value="dotted">Dotted</option>
+                <option value="dashed">Dashed</option>
+              </select>
+            </div>
+
+            {/* ... other marker options ... */}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -624,6 +875,15 @@ const QRGenerator = () => {
           margin: 0,
         },
         ...qrStyle,
+        markerBorderOptions: qrStyle.markerBorderOptions || {
+          color: "#000000",
+          width: 2,
+          style: "solid",
+        },
+        markerCenterOptions: qrStyle.markerCenterOptions || {
+          color: "#000000",
+          type: "square",
+        },
       });
 
       // Clear previous content
@@ -690,6 +950,15 @@ const QRGenerator = () => {
             margin: 0,
           },
           ...preset.style,
+          markerBorderOptions: preset.style.markerBorderOptions || {
+            color: "#000000",
+            width: 2,
+            style: "solid",
+          },
+          markerCenterOptions: preset.style.markerCenterOptions || {
+            color: "#000000",
+            type: "square",
+          },
         });
 
         // Clear previous content
@@ -818,48 +1087,11 @@ const QRGenerator = () => {
               <h3 className="text-sm font-medium text-gray-700">
                 Preset Styles
               </h3>
-              <div className="grid grid-cols-2 gap-3">
-                {QRPresets.map((preset) => (
-                  <button
-                    key={preset.id}
-                    onClick={() => handlePresetChange(preset.id)}
-                    className={`p-4 rounded-lg border-2 transition-all ${
-                      selectedPreset === preset.id && !customStyle
-                        ? "border-blue-500 bg-blue-50"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                  >
-                    <div
-                      className="w-full aspect-square rounded-lg mb-2 overflow-hidden"
-                      style={{ backgroundColor: preset.style.backgroundColor }}
-                    >
-                      <div className="w-full h-full grid grid-cols-3 gap-1 p-2">
-                        {[...Array(9)].map((_, i) => (
-                          <div
-                            key={i}
-                            className="rounded-sm"
-                            style={{
-                              backgroundColor:
-                                i < 3
-                                  ? preset.style.cornerSquareOptions.color
-                                  : i === 4
-                                  ? preset.style.cornerDotOptions.color
-                                  : preset.style.dotsOptions.color,
-                              borderRadius:
-                                preset.style.dotsOptions.type === "dots"
-                                  ? "50%"
-                                  : "2px",
-                            }}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                    <span className="text-sm font-medium text-gray-700">
-                      {preset.name}
-                    </span>
-                  </button>
-                ))}
-              </div>
+              <PresetGrid
+                presets={QRPresets}
+                selectedPreset={selectedPreset}
+                onSelect={handlePresetChange}
+              />
             </div>
 
             <div className="border-t border-gray-200 pt-4">
@@ -926,6 +1158,51 @@ const QRGenerator = () => {
           </div>
         </div>
       </div>
+    </div>
+  );
+};
+
+const PresetGrid = ({ presets, selectedPreset, onSelect }) => {
+  return (
+    <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+      {presets.map((preset) => (
+        <button
+          key={preset.id}
+          onClick={() => onSelect(preset.id)}
+          className={`p-2 rounded-lg border-2 transition-all ${
+            selectedPreset === preset.id
+              ? "border-blue-500 bg-blue-50"
+              : "border-gray-200 hover:border-gray-300"
+          }`}
+        >
+          <div
+            className="w-full aspect-square rounded-lg mb-1 overflow-hidden"
+            style={{ backgroundColor: preset.style.backgroundColor }}
+          >
+            <div className="w-full h-full grid grid-cols-3 gap-1 p-1">
+              {[...Array(9)].map((_, i) => (
+                <div
+                  key={i}
+                  className="rounded-sm"
+                  style={{
+                    backgroundColor:
+                      i < 3
+                        ? preset.style.cornerSquareOptions.color
+                        : i === 4
+                        ? preset.style.cornerDotOptions.color
+                        : preset.style.dotsOptions.color,
+                    borderRadius:
+                      preset.style.dotsOptions.type === "dots" ? "50%" : "2px",
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+          <span className="text-xs font-medium text-gray-700 truncate block">
+            {preset.name}
+          </span>
+        </button>
+      ))}
     </div>
   );
 };
