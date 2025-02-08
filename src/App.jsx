@@ -343,8 +343,90 @@ const QRPresets = [
       cornerSquareOptions: { type: "square", color: "#000000" },
       cornerDotOptions: { type: "square", color: "#000000" },
       backgroundColor: "#FFFFFF",
-      markerBorderOptions: { color: "#000000", width: 2, style: "solid" },
-      markerCenterOptions: { color: "#000000", type: "square" },
+      frame: {
+        enabled: false,
+        text: "Scan me",
+        color: "#000000",
+        textColor: "#FFFFFF",
+        font: "Inter",
+        pattern: "solid",
+      },
+    },
+  },
+  {
+    id: "double-frame",
+    name: "Double Frame",
+    style: {
+      type: "square",
+      dotsOptions: { type: "dots", color: "#1F2937" },
+      cornerSquareOptions: { type: "extra-rounded", color: "#1F2937" },
+      cornerDotOptions: { type: "dot", color: "#1F2937" },
+      backgroundColor: "#FFFFFF",
+      frame: {
+        enabled: false,
+        text: "Scan to explore",
+        color: "#1F2937",
+        textColor: "#FFFFFF",
+        font: "Poppins",
+        pattern: "double",
+      },
+    },
+  },
+  {
+    id: "dashed-elegant",
+    name: "Dashed Elegant",
+    style: {
+      type: "rounded",
+      dotsOptions: { type: "rounded", color: "#4F46E5" },
+      cornerSquareOptions: { type: "extra-rounded", color: "#4F46E5" },
+      cornerDotOptions: { type: "dot", color: "#4F46E5" },
+      backgroundColor: "#F3F4F6",
+      frame: {
+        enabled: false,
+        text: "Scan for more",
+        color: "#4F46E5",
+        textColor: "#FFFFFF",
+        font: "Inter",
+        pattern: "dashed",
+      },
+    },
+  },
+  {
+    id: "dotted-modern",
+    name: "Dotted Modern",
+    style: {
+      type: "dots",
+      dotsOptions: { type: "dots", color: "#059669" },
+      cornerSquareOptions: { type: "extra-rounded", color: "#059669" },
+      cornerDotOptions: { type: "dot", color: "#059669" },
+      backgroundColor: "#ECFDF5",
+      frame: {
+        enabled: false,
+        text: "Scan to begin",
+        color: "#059669",
+        textColor: "#FFFFFF",
+        font: "system-ui",
+        pattern: "dotted",
+      },
+    },
+  },
+  {
+    id: "gradient-frame",
+    name: "Gradient Frame",
+    style: {
+      type: "rounded",
+      dotsOptions: { type: "rounded", color: "#8B5CF6" },
+      cornerSquareOptions: { type: "extra-rounded", color: "#8B5CF6" },
+      cornerDotOptions: { type: "dot", color: "#8B5CF6" },
+      backgroundColor: "#FFFFFF",
+      frame: {
+        enabled: false,
+        text: "Scan to discover",
+        color: "#8B5CF6",
+        textColor: "#FFFFFF",
+        font: "Poppins",
+        pattern: "gradient",
+      },
     },
   },
   {
@@ -356,8 +438,13 @@ const QRPresets = [
       cornerSquareOptions: { type: "extra-rounded", color: "#5856D6" },
       cornerDotOptions: { type: "dot", color: "#007AFF" },
       backgroundColor: "#FFFFFF",
-      markerBorderOptions: { color: "#5856D6", width: 3, style: "double" },
-      markerCenterOptions: { color: "#FF3B30", type: "circle" },
+      frame: {
+        enabled: false,
+        text: "Scan to explore",
+        color: "#5856D6",
+        textColor: "#FFFFFF",
+        font: "Poppins",
+      },
     },
   },
   {
@@ -369,6 +456,13 @@ const QRPresets = [
       cornerSquareOptions: { type: "extra-rounded", color: "#4F46E5" },
       cornerDotOptions: { type: "dot", color: "#4F46E5" },
       backgroundColor: "#F3F4F6",
+      frame: {
+        enabled: false,
+        text: "Scan for more",
+        color: "#4F46E5",
+        textColor: "#FFFFFF",
+        font: "Inter",
+      },
     },
   },
   {
@@ -413,6 +507,13 @@ const QRPresets = [
       cornerSquareOptions: { type: "extra-rounded", color: "#8B5CF6" },
       cornerDotOptions: { type: "dot", color: "#EC4899" },
       backgroundColor: "#FFFFFF",
+      frame: {
+        enabled: false,
+        text: "Scan to discover",
+        color: "#8B5CF6",
+        textColor: "#FFFFFF",
+        font: "Poppins",
+      },
     },
   },
   {
@@ -424,6 +525,14 @@ const QRPresets = [
       cornerSquareOptions: { type: "extra-rounded", color: "#047857" },
       cornerDotOptions: { type: "dot", color: "#065F46" },
       backgroundColor: "#ECFDF5",
+      frame: {
+        enabled: false,
+        enabled: true,
+        text: "Scan me",
+        color: "#047857",
+        textColor: "#FFFFFF",
+        font: "system-ui",
+      },
     },
   },
   {
@@ -435,6 +544,13 @@ const QRPresets = [
       cornerSquareOptions: { type: "extra-rounded", color: "#D97706" },
       cornerDotOptions: { type: "dot", color: "#B45309" },
       backgroundColor: "#FFFBEB",
+      frame: {
+        enabled: true,
+        text: "Scan to begin",
+        color: "#D97706",
+        textColor: "#FFFFFF",
+        font: "Roboto",
+      },
     },
   },
   {
@@ -446,6 +562,13 @@ const QRPresets = [
       cornerSquareOptions: { type: "extra-rounded", color: "#F3F4F6" },
       cornerDotOptions: { type: "dot", color: "#F9FAFB" },
       backgroundColor: "#111827",
+      frame: {
+        enabled: true,
+        text: "Scan QR Code",
+        color: "#F3F4F6",
+        textColor: "#111827",
+        font: "Inter",
+      },
     },
   },
   {
@@ -620,6 +743,64 @@ const PatternPreview = ({ type, color, size = 32 }) => (
     }}
   />
 );
+
+const FramePatternPreview = ({ pattern, color, selected, onClick }) => {
+  const previewStyle = {
+    width: "100%",
+    height: "100%",
+    backgroundColor: "#FFFFFF",
+    position: "relative",
+  };
+
+  const frameStyle = {
+    position: "absolute",
+    inset: "4px",
+    backgroundColor: "#FFFFFF",
+  };
+
+  switch (pattern) {
+    case "double":
+      frameStyle.border = `2px double ${color}`;
+      frameStyle.boxShadow = `0 0 0 4px ${color}`;
+      break;
+    case "dashed":
+      frameStyle.border = `2px dashed ${color}`;
+      frameStyle.boxShadow = `0 0 0 4px ${color}`;
+      break;
+    case "dotted":
+      frameStyle.border = `2px dotted ${color}`;
+      frameStyle.boxShadow = `0 0 0 4px ${color}`;
+      break;
+    case "gradient":
+      frameStyle.border = `4px solid ${color}`;
+      frameStyle.background = `linear-gradient(45deg, ${color}22, transparent)`;
+      break;
+    default:
+      frameStyle.border = `4px solid ${color}`;
+  }
+
+  return (
+    <button
+      onClick={onClick}
+      className={`p-2 rounded-lg border-2 transition-all ${
+        selected
+          ? "border-blue-500 bg-blue-50"
+          : "border-gray-200 hover:border-gray-300"
+      }`}
+    >
+      <div className="flex flex-col items-center">
+        <div className="w-12 h-12 relative mb-1">
+          <div style={previewStyle}>
+            <div style={frameStyle} className="rounded-lg" />
+          </div>
+        </div>
+        <span className="text-xs font-medium text-gray-700 capitalize">
+          {pattern}
+        </span>
+      </div>
+    </button>
+  );
+};
 
 const CustomStyleForm = ({ style, onChange }) => {
   const [sectionsOpen, setSectionsOpen] = useState({
@@ -895,6 +1076,25 @@ const CustomStyleForm = ({ style, onChange }) => {
 
             {style.frame?.enabled && (
               <>
+                <div className="space-y-3">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Frame Pattern
+                  </label>
+                  <div className="grid grid-cols-5 gap-3">
+                    {["solid", "double", "dashed", "dotted", "gradient"].map(
+                      (pattern) => (
+                        <FramePatternPreview
+                          key={pattern}
+                          pattern={pattern}
+                          color={style.frame?.color || "#000000"}
+                          selected={style.frame?.pattern === pattern}
+                          onClick={() => handleFrameChange("pattern", pattern)}
+                        />
+                      )
+                    )}
+                  </div>
+                </div>
+
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">
                     Frame Text
@@ -1041,30 +1241,43 @@ const QRGenerator = () => {
         qrRef.current.removeChild(qrRef.current.firstChild);
       }
 
-      qr.append(qrRef.current);
-      qrCodeRef.current = qrRef.current.querySelector("canvas");
+      // Create main container
+      const container = document.createElement("div");
+      container.className = "relative w-full aspect-square";
+      qrRef.current.appendChild(container);
 
-      // Add frame if enabled
+      // Create QR wrapper with frame if enabled
+      const qrWrapper = document.createElement("div");
+      qrWrapper.className = "w-full h-full flex items-center justify-center";
+
       if (qrStyle.frame?.enabled) {
-        const frameContainer = document.createElement("div");
-        frameContainer.className = "relative";
-        qrRef.current.appendChild(frameContainer);
+        qrWrapper.style.padding = "24px";
+        qrWrapper.style.border = `8px solid ${
+          qrStyle.frame.color || "#000000"
+        }`;
+        qrWrapper.style.borderRadius = "16px";
 
-        const frame = document.createElement("div");
-        frame.className =
-          "absolute inset-0 border-8 rounded-xl flex items-end justify-center pb-2";
-        frame.style.borderColor = qrStyle.frame.color || "#000000";
-        frame.style.fontFamily = qrStyle.frame.font || "system-ui";
-
-        const text = document.createElement("div");
-        text.className = "px-4 py-1 rounded-full text-sm font-medium";
-        text.style.backgroundColor = qrStyle.frame.color || "#000000";
-        text.style.color = qrStyle.frame.textColor || "#FFFFFF";
-        text.textContent = qrStyle.frame.text || "Scan me";
-
-        frame.appendChild(text);
-        frameContainer.appendChild(frame);
+        // Add frame text if provided
+        if (qrStyle.frame.text) {
+          const textElement = document.createElement("div");
+          textElement.className =
+            "absolute left-1/2 transform -translate-x-1/2 bottom-[-36px]";
+          textElement.style.backgroundColor = qrStyle.frame.color || "#000000";
+          textElement.style.color = qrStyle.frame.textColor || "#FFFFFF";
+          textElement.style.padding = "8px 24px";
+          textElement.style.borderRadius = "24px";
+          textElement.style.fontSize = "16px";
+          textElement.style.fontWeight = "500";
+          textElement.style.whiteSpace = "nowrap";
+          textElement.style.fontFamily = qrStyle.frame.font || "system-ui";
+          textElement.textContent = qrStyle.frame.text;
+          container.appendChild(textElement);
+        }
       }
+
+      container.appendChild(qrWrapper);
+      qr.append(qrWrapper);
+      qrCodeRef.current = qrWrapper.querySelector("canvas");
     }
   }, [debouncedQrData, qrStyle]);
 
