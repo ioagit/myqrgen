@@ -502,6 +502,71 @@ const QRPresets = [
   },
 ];
 
+const StyleOption = ({ selected, onClick, children, style }) => (
+  <button
+    onClick={onClick}
+    className={`p-3 rounded-lg border-2 transition-all ${
+      selected
+        ? "border-blue-500 bg-blue-50"
+        : "border-gray-200 hover:border-gray-300"
+    }`}
+    style={style}
+  >
+    {children}
+  </button>
+);
+
+const StyleGrid = ({ options, value, onChange, color }) => (
+  <div className="grid grid-cols-4 gap-2">
+    {options.map((option) => {
+      const Icon = option.icon;
+      const isSelected = value === option.value;
+
+      return (
+        <StyleOption
+          key={option.value}
+          selected={isSelected}
+          onClick={() => onChange(option.value)}
+          style={{ backgroundColor: isSelected ? "#EBF5FF" : undefined }}
+        >
+          <div className="flex flex-col items-center">
+            <div
+              className="w-8 h-8 flex items-center justify-center mb-1"
+              style={{ color: color }}
+            >
+              <Icon className="w-6 h-6" />
+            </div>
+            <span className="text-xs font-medium text-gray-700">
+              {option.label}
+            </span>
+          </div>
+        </StyleOption>
+      );
+    })}
+  </div>
+);
+
+const PatternPreview = ({ type, color, size = 32 }) => (
+  <div
+    className="border rounded"
+    style={{
+      width: size,
+      height: size,
+      backgroundColor: color,
+      borderRadius:
+        type === "dots"
+          ? "50%"
+          : type === "rounded"
+          ? "25%"
+          : type === "classy"
+          ? "15%"
+          : type === "classy-rounded"
+          ? "40%"
+          : "0",
+    }}
+  />
+);
+
 const CustomStyleForm = ({ style, onChange }) => {
   const [sectionsOpen, setSectionsOpen] = useState({
     colors: true,
@@ -516,15 +581,44 @@ const CustomStyleForm = ({ style, onChange }) => {
     }));
   };
 
-  const handleChange = (key, value) => {
-    onChange({ ...style, [key]: value });
-  };
-
   const handleNestedChange = (section, key, value) => {
-    onChange({
-      ...style,
-      [section]: { ...style[section], [key]: value },
-    });
+    const newStyle = { ...style };
+
+    // Handle special cases for corner options
+    if (section === "cornerSquareOptions") {
+      newStyle.cornersSquareOptions = {
+        ...newStyle.cornersSquareOptions,
+        [key]: value,
+      };
+      // Also update the cornerSquareOptions for backward compatibility
+      newStyle.cornerSquareOptions = {
+        ...newStyle.cornerSquareOptions,
+        [key]: value,
+      };
+    } else if (section === "cornerDotOptions") {
+      newStyle.cornersDotOptions = {
+        ...newStyle.cornersDotOptions,
+        [key]: value,
+      };
+      // Also update the cornerDotOptions for backward compatibility
+      newStyle.cornerDotOptions = {
+        ...newStyle.cornerDotOptions,
+        [key]: value,
+      };
+    } else if (section === "backgroundColor") {
+      newStyle.backgroundOptions = {
+        ...newStyle.backgroundOptions,
+        color: value,
+      };
+      newStyle.backgroundColor = value;
+    } else {
+      newStyle[section] = {
+        ...newStyle[section],
+        [key]: value,
+      };
+    }
+
+    onChange(newStyle);
   };
 
   return (
@@ -553,12 +647,14 @@ const CustomStyleForm = ({ style, onChange }) => {
           </svg>
         </button>
         {sectionsOpen.colors && (
-          <div className="p-4 space-y-4">
-            <div className="grid grid-cols-1 gap-4">
+          <div className="p-4">
+            <div className="grid grid-cols-2 gap-4">
               <ColorPicker
                 label="Background"
                 color={style.backgroundColor}
-                onChange={(color) => handleChange("backgroundColor", color)}
+                onChange={(color) =>
+                  handleNestedChange("backgroundColor", "color", color)
+                }
               />
               <ColorPicker
                 label="Dots"
@@ -624,52 +720,197 @@ const CustomStyleForm = ({ style, onChange }) => {
           </svg>
         </button>
         {sectionsOpen.patterns && (
-          <div className="p-4 space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="p-4 space-y-6">
+            {/* Dots Style */}
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-700">
                 Dots Style
               </label>
-              <select
-                value={style.dotsOptions.type}
-                onChange={(e) =>
-                  handleNestedChange("dotsOptions", "type", e.target.value)
-                }
-                className="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="square">Square</option>
-                <option value="dots">Dots</option>
-                <option value="rounded">Rounded</option>
-                <option value="classy">Classy</option>
-                <option value="classy-rounded">Classy Rounded</option>
-              </select>
+              <div className="grid grid-cols-5 gap-3">
+                {[
+                  { type: "square", label: "Square" },
+                  { type: "dots", label: "Dots" },
+                  { type: "rounded", label: "Rounded" },
+                  { type: "classy", label: "Classy" },
+                  { type: "classy-rounded", label: "Classy Rounded" },
+                ].map((option) => (
+                  <button
+                    key={option.type}
+                    onClick={() =>
+                      handleNestedChange("dotsOptions", "type", option.type)
+                    }
+                    className={`p-2 rounded-lg border-2 transition-all ${
+                      style.dotsOptions.type === option.type
+                        ? "border-blue-500 bg-blue-50"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <div className="flex flex-col items-center">
+                      <PatternPreview
+                        type={option.type}
+                        color={style.dotsOptions.color}
+                      />
+                      <span className="text-xs font-medium text-gray-700 mt-1">
+                        {option.label}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            {/* Corner Squares Style */}
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-700">
+                Corner Squares Style
+              </label>
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { type: "square", label: "Square" },
+                  { type: "dot", label: "Dots" },
+                  { type: "extra-rounded", label: "Extra Rounded" },
+                ].map((option) => (
+                  <button
+                    key={option.type}
+                    onClick={() =>
+                      handleNestedChange(
+                        "cornerSquareOptions",
+                        "type",
+                        option.type
+                      )
+                    }
+                    className={`p-2 rounded-lg border-2 transition-all ${
+                      style.cornerSquareOptions.type === option.type
+                        ? "border-blue-500 bg-blue-50"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <div className="flex flex-col items-center">
+                      <PatternPreview
+                        type={option.type}
+                        color={style.cornerSquareOptions.color}
+                        size={40}
+                      />
+                      <span className="text-xs font-medium text-gray-700 mt-1">
+                        {option.label}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Marker Border Style */}
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-700">
                 Marker Border Style
               </label>
-              <select
-                value={style.markerBorderOptions?.style || "solid"}
-                onChange={(e) =>
-                  handleNestedChange(
-                    "markerBorderOptions",
-                    "style",
-                    e.target.value
-                  )
-                }
-                className="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="solid">Solid</option>
-                <option value="double">Double</option>
-                <option value="dotted">Dotted</option>
-                <option value="dashed">Dashed</option>
-              </select>
+              <div className="grid grid-cols-4 gap-3">
+                {[
+                  { type: "solid", label: "Solid" },
+                  { type: "double", label: "Double" },
+                  { type: "dotted", label: "Dotted" },
+                  { type: "dashed", label: "Dashed" },
+                ].map((option) => (
+                  <button
+                    key={option.type}
+                    onClick={() =>
+                      handleNestedChange(
+                        "markerBorderOptions",
+                        "style",
+                        option.type
+                      )
+                    }
+                    className={`p-2 rounded-lg border-2 transition-all ${
+                      style.markerBorderOptions?.style === option.type
+                        ? "border-blue-500 bg-blue-50"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <div className="flex flex-col items-center">
+                      <div
+                        className="w-10 h-10 rounded-lg"
+                        style={{
+                          border: `3px ${option.type} ${
+                            style.markerBorderOptions?.color || "#000000"
+                          }`,
+                        }}
+                      />
+                      <span className="text-xs font-medium text-gray-700 mt-1">
+                        {option.label}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Marker Border Width
+            {/* Marker Center Style */}
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-700">
+                Marker Center Style
               </label>
+              <div className="grid grid-cols-4 gap-3">
+                {[
+                  { type: "square", label: "Square" },
+                  { type: "circle", label: "Circle" },
+                  { type: "diamond", label: "Diamond" },
+                  { type: "extra-rounded", label: "Extra Rounded" },
+                ].map((option) => (
+                  <button
+                    key={option.type}
+                    onClick={() =>
+                      handleNestedChange(
+                        "markerCenterOptions",
+                        "type",
+                        option.type
+                      )
+                    }
+                    className={`p-2 rounded-lg border-2 transition-all ${
+                      style.markerCenterOptions?.type === option.type
+                        ? "border-blue-500 bg-blue-50"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <div className="flex flex-col items-center">
+                      <div
+                        className="w-8 h-8"
+                        style={{
+                          backgroundColor:
+                            style.markerCenterOptions?.color || "#000000",
+                          borderRadius:
+                            option.type === "circle"
+                              ? "50%"
+                              : option.type === "diamond"
+                              ? "0"
+                              : option.type === "extra-rounded"
+                              ? "35%"
+                              : "0",
+                          transform:
+                            option.type === "diamond"
+                              ? "rotate(45deg)"
+                              : "none",
+                        }}
+                      />
+                      <span className="text-xs font-medium text-gray-700 mt-1">
+                        {option.label}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Marker Border Width */}
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <label className="block text-sm font-medium text-gray-700">
+                  Marker Border Width
+                </label>
+                <span className="text-sm text-gray-500">
+                  {style.markerBorderOptions?.width || 2}px
+                </span>
+              </div>
               <input
                 type="range"
                 min="1"
@@ -684,68 +925,10 @@ const CustomStyleForm = ({ style, onChange }) => {
                 }
                 className="w-full"
               />
-              <div className="text-sm text-gray-500 mt-1">
-                Width: {style.markerBorderOptions?.width || 2}px
+              <div className="flex justify-between text-xs text-gray-500">
+                <span>1px</span>
+                <span>5px</span>
               </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Marker Center Style
-              </label>
-              <select
-                value={style.markerCenterOptions?.type || "square"}
-                onChange={(e) =>
-                  handleNestedChange(
-                    "markerCenterOptions",
-                    "type",
-                    e.target.value
-                  )
-                }
-                className="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="square">Square</option>
-                <option value="circle">Circle</option>
-                <option value="diamond">Diamond</option>
-                <option value="extra-rounded">Extra Rounded</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Corner Squares Style
-              </label>
-              <select
-                value={style.cornerSquareOptions.type}
-                onChange={(e) =>
-                  handleNestedChange(
-                    "cornerSquareOptions",
-                    "type",
-                    e.target.value
-                  )
-                }
-                className="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="square">Square</option>
-                <option value="dot">Dots</option>
-                <option value="extra-rounded">Extra Rounded</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Corner Dots Style
-              </label>
-              <select
-                value={style.cornerDotOptions.type}
-                onChange={(e) =>
-                  handleNestedChange("cornerDotOptions", "type", e.target.value)
-                }
-                className="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="square">Square</option>
-                <option value="dot">Dots</option>
-              </select>
             </div>
           </div>
         )}
@@ -813,7 +996,11 @@ const QRGenerator = () => {
   const [qrType, setQrType] = useState("text");
   const [selectedPreset, setSelectedPreset] = useState("classic");
   const [qrStyle, setQrStyle] = useState(QRPresets[0].style);
-  const [customStyle, setCustomStyle] = useState(false);
+  const [sectionsOpen, setSectionsOpen] = useState({
+    qrSettings: true,
+    styleOptions: false,
+    customOptions: false,
+  });
   const qrRef = useRef(null);
   const qrCodeRef = useRef(null);
   const debounceTimeout = useRef(null);
@@ -874,15 +1061,21 @@ const QRGenerator = () => {
           imageSize: 0.4,
           margin: 0,
         },
-        ...qrStyle,
-        markerBorderOptions: qrStyle.markerBorderOptions || {
-          color: "#000000",
-          width: 2,
-          style: "solid",
+        type: qrStyle.type || "square",
+        dotsOptions: {
+          type: qrStyle.dotsOptions?.type || "square",
+          color: qrStyle.dotsOptions?.color || "#000000",
         },
-        markerCenterOptions: qrStyle.markerCenterOptions || {
-          color: "#000000",
-          type: "square",
+        cornersSquareOptions: {
+          type: qrStyle.cornerSquareOptions?.type || "square",
+          color: qrStyle.cornerSquareOptions?.color || "#000000",
+        },
+        cornersDotOptions: {
+          type: qrStyle.cornerDotOptions?.type || "square",
+          color: qrStyle.cornerDotOptions?.color || "#000000",
+        },
+        backgroundOptions: {
+          color: qrStyle.backgroundColor || "#FFFFFF",
         },
       });
 
@@ -931,8 +1124,21 @@ const QRGenerator = () => {
     const preset = QRPresets.find((p) => p.id === presetId);
     if (preset) {
       setSelectedPreset(presetId);
-      setQrStyle(preset.style);
-      setCustomStyle(false);
+      setQrStyle({
+        ...preset.style,
+        dotsOptions: { ...preset.style.dotsOptions },
+        cornerSquareOptions: { ...preset.style.cornerSquareOptions },
+        cornerDotOptions: { ...preset.style.cornerDotOptions },
+        markerBorderOptions: preset.style.markerBorderOptions || {
+          color: "#000000",
+          width: 2,
+          style: "solid",
+        },
+        markerCenterOptions: preset.style.markerCenterOptions || {
+          color: "#000000",
+          type: "square",
+        },
+      });
 
       // Force QR code update with new style
       if (qrCodeRef.current) {
@@ -950,14 +1156,10 @@ const QRGenerator = () => {
             margin: 0,
           },
           ...preset.style,
-          markerBorderOptions: preset.style.markerBorderOptions || {
-            color: "#000000",
-            width: 2,
-            style: "solid",
-          },
-          markerCenterOptions: preset.style.markerCenterOptions || {
-            color: "#000000",
-            type: "square",
+          cornersSquareOptions: preset.style.cornerSquareOptions,
+          cornersDotOptions: preset.style.cornerDotOptions,
+          backgroundOptions: {
+            color: preset.style.backgroundColor,
           },
         });
 
@@ -970,17 +1172,6 @@ const QRGenerator = () => {
         qrCodeRef.current = qrRef.current.querySelector("canvas");
       }
     }
-  };
-
-  const handleCustomStyleToggle = () => {
-    if (!customStyle) {
-      // When enabling custom style, use the current preset as starting point
-      const preset = QRPresets.find((p) => p.id === selectedPreset);
-      if (preset) {
-        setQrStyle(preset.style);
-      }
-    }
-    setCustomStyle(!customStyle);
   };
 
   const qrTypes = [
@@ -1025,99 +1216,165 @@ const QRGenerator = () => {
   const selectedType = qrTypes.find((type) => type.value === qrType);
   const FormComponent = selectedType?.component;
 
+  const toggleSection = (section) => {
+    setSectionsOpen((prev) => ({
+      ...prev,
+      [section]: !prev[section],
+    }));
+  };
+
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-8">
-      <div className="grid md:grid-cols-3 gap-8">
-        {/* Left Column - Input Section */}
-        <div className="space-y-6">
-          <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
-            <h2 className="text-xl font-semibold text-gray-800">
-              QR Code Settings
-            </h2>
-
-            <div className="space-y-4">
-              <label className="block text-sm font-medium text-gray-700">
-                Type
-              </label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {qrTypes.map((type) => {
-                  const Icon = type.icon;
-                  return (
-                    <button
-                      key={type.value}
-                      onClick={() => {
-                        setQrType(type.value);
-                        setQrData("");
-                      }}
-                      className={`flex items-center justify-center p-3 rounded-lg border-2 transition-all ${
-                        qrType === type.value
-                          ? "border-blue-500 bg-blue-50 text-blue-600"
-                          : "border-gray-200 hover:border-gray-300 text-gray-600 hover:bg-gray-50"
-                      }`}
-                    >
-                      <Icon className="w-5 h-5 mr-2" />
-                      <span className="text-sm font-medium">{type.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                {selectedType?.label} Details
-              </label>
-              {FormComponent && (
-                <FormComponent value={qrData} onChange={setQrData} />
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Middle Column - Style Options */}
-        <div className="space-y-6">
-          <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
-            <h2 className="text-xl font-semibold text-gray-800 flex items-center">
-              <Palette className="w-6 h-6 mr-2 text-blue-500" />
-              Style Options
-            </h2>
-
-            {/* Preset Styles */}
-            <div className="space-y-4">
-              <h3 className="text-sm font-medium text-gray-700">
-                Preset Styles
-              </h3>
-              <PresetGrid
-                presets={QRPresets}
-                selectedPreset={selectedPreset}
-                onSelect={handlePresetChange}
-              />
-            </div>
-
-            <div className="border-t border-gray-200 pt-4">
-              <button
-                onClick={handleCustomStyleToggle}
-                className={`w-full p-3 rounded-lg border-2 transition-all ${
-                  customStyle
-                    ? "border-blue-500 bg-blue-50 text-blue-600"
-                    : "border-gray-200 hover:border-gray-300 text-gray-600"
+    <div className="max-w-7xl mx-auto p-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Left Column - Settings (2/3 width) */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* QR Code Settings Section */}
+          <div className="bg-white rounded-xl shadow-sm">
+            <button
+              onClick={() => toggleSection("qrSettings")}
+              className="w-full px-6 py-4 flex justify-between items-center hover:bg-gray-50"
+            >
+              <h2 className="text-xl font-semibold text-gray-800">
+                QR Code Settings
+              </h2>
+              <svg
+                className={`w-5 h-5 transform transition-transform ${
+                  sectionsOpen.qrSettings ? "rotate-180" : ""
                 }`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                <span className="text-sm font-medium">Custom Style</span>
-              </button>
-            </div>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+            {sectionsOpen.qrSettings && (
+              <div className="p-6 border-t space-y-6">
+                <div className="space-y-4">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Type
+                  </label>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {qrTypes.map((type) => {
+                      const Icon = type.icon;
+                      return (
+                        <button
+                          key={type.value}
+                          onClick={() => {
+                            setQrType(type.value);
+                            setQrData("");
+                          }}
+                          className={`flex items-center justify-center p-3 rounded-lg border-2 transition-all ${
+                            qrType === type.value
+                              ? "border-blue-500 bg-blue-50 text-blue-600"
+                              : "border-gray-200 hover:border-gray-300 text-gray-600 hover:bg-gray-50"
+                          }`}
+                        >
+                          <Icon className="w-5 h-5 mr-2" />
+                          <span className="text-sm font-medium">
+                            {type.label}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
 
-            {customStyle && (
-              <div className="space-y-6">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    {selectedType?.label} Details
+                  </label>
+                  {FormComponent && (
+                    <FormComponent value={qrData} onChange={setQrData} />
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Style Options Section */}
+          <div className="bg-white rounded-xl shadow-sm">
+            <button
+              onClick={() => toggleSection("styleOptions")}
+              className="w-full px-6 py-4 flex justify-between items-center hover:bg-gray-50"
+            >
+              <h2 className="text-xl font-semibold text-gray-800 flex items-center">
+                <Palette className="w-6 h-6 mr-2 text-blue-500" />
+                Style Options
+              </h2>
+              <svg
+                className={`w-5 h-5 transform transition-transform ${
+                  sectionsOpen.styleOptions ? "rotate-180" : ""
+                }`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+            {sectionsOpen.styleOptions && (
+              <div className="p-6 border-t space-y-6">
+                <div className="space-y-4">
+                  <h3 className="text-sm font-medium text-gray-700">
+                    Preset Styles
+                  </h3>
+                  <PresetGrid
+                    presets={QRPresets}
+                    selectedPreset={selectedPreset}
+                    onSelect={handlePresetChange}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Custom Style Section */}
+          <div className="bg-white rounded-xl shadow-sm">
+            <button
+              onClick={() => toggleSection("customOptions")}
+              className="w-full px-6 py-4 flex justify-between items-center hover:bg-gray-50"
+            >
+              <h2 className="text-xl font-semibold text-gray-800">
+                Custom Style Options
+              </h2>
+              <svg
+                className={`w-5 h-5 transform transition-transform ${
+                  sectionsOpen.customOptions ? "rotate-180" : ""
+                }`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+            {sectionsOpen.customOptions && (
+              <div className="p-6 border-t">
                 <CustomStyleForm style={qrStyle} onChange={setQrStyle} />
               </div>
             )}
           </div>
         </div>
 
-        {/* Right Column - QR Code Display */}
-        <div className="space-y-6">
-          <div className="bg-white rounded-xl shadow-sm p-6">
+        {/* Right Column - QR Preview (1/3 width) */}
+        <div className="lg:col-span-1">
+          <div className="bg-white rounded-xl shadow-sm p-6 sticky top-6">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
               Generated QR Code
             </h2>
