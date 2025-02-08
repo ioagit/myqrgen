@@ -571,7 +571,6 @@ const CustomStyleForm = ({ style, onChange }) => {
   const [sectionsOpen, setSectionsOpen] = useState({
     colors: true,
     patterns: true,
-    markers: true,
   });
 
   const toggleSection = (section) => {
@@ -675,20 +674,6 @@ const CustomStyleForm = ({ style, onChange }) => {
                 color={style.cornerDotOptions.color}
                 onChange={(color) =>
                   handleNestedChange("cornerDotOptions", "color", color)
-                }
-              />
-              <ColorPicker
-                label="Marker Border"
-                color={style.markerBorderOptions?.color || "#000000"}
-                onChange={(color) =>
-                  handleNestedChange("markerBorderOptions", "color", color)
-                }
-              />
-              <ColorPicker
-                label="Marker Center"
-                color={style.markerCenterOptions?.color || "#000000"}
-                onChange={(color) =>
-                  handleNestedChange("markerCenterOptions", "color", color)
                 }
               />
             </div>
@@ -799,190 +784,6 @@ const CustomStyleForm = ({ style, onChange }) => {
                 ))}
               </div>
             </div>
-
-            {/* Marker Border Style */}
-            <div className="space-y-3">
-              <label className="block text-sm font-medium text-gray-700">
-                Marker Border Style
-              </label>
-              <div className="grid grid-cols-4 gap-3">
-                {[
-                  { type: "solid", label: "Solid" },
-                  { type: "double", label: "Double" },
-                  { type: "dotted", label: "Dotted" },
-                  { type: "dashed", label: "Dashed" },
-                ].map((option) => (
-                  <button
-                    key={option.type}
-                    onClick={() =>
-                      handleNestedChange(
-                        "markerBorderOptions",
-                        "style",
-                        option.type
-                      )
-                    }
-                    className={`p-2 rounded-lg border-2 transition-all ${
-                      style.markerBorderOptions?.style === option.type
-                        ? "border-blue-500 bg-blue-50"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                  >
-                    <div className="flex flex-col items-center">
-                      <div
-                        className="w-10 h-10 rounded-lg"
-                        style={{
-                          border: `3px ${option.type} ${
-                            style.markerBorderOptions?.color || "#000000"
-                          }`,
-                        }}
-                      />
-                      <span className="text-xs font-medium text-gray-700 mt-1">
-                        {option.label}
-                      </span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Marker Center Style */}
-            <div className="space-y-3">
-              <label className="block text-sm font-medium text-gray-700">
-                Marker Center Style
-              </label>
-              <div className="grid grid-cols-4 gap-3">
-                {[
-                  { type: "square", label: "Square" },
-                  { type: "circle", label: "Circle" },
-                  { type: "diamond", label: "Diamond" },
-                  { type: "extra-rounded", label: "Extra Rounded" },
-                ].map((option) => (
-                  <button
-                    key={option.type}
-                    onClick={() =>
-                      handleNestedChange(
-                        "markerCenterOptions",
-                        "type",
-                        option.type
-                      )
-                    }
-                    className={`p-2 rounded-lg border-2 transition-all ${
-                      style.markerCenterOptions?.type === option.type
-                        ? "border-blue-500 bg-blue-50"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                  >
-                    <div className="flex flex-col items-center">
-                      <div
-                        className="w-8 h-8"
-                        style={{
-                          backgroundColor:
-                            style.markerCenterOptions?.color || "#000000",
-                          borderRadius:
-                            option.type === "circle"
-                              ? "50%"
-                              : option.type === "diamond"
-                              ? "0"
-                              : option.type === "extra-rounded"
-                              ? "35%"
-                              : "0",
-                          transform:
-                            option.type === "diamond"
-                              ? "rotate(45deg)"
-                              : "none",
-                        }}
-                      />
-                      <span className="text-xs font-medium text-gray-700 mt-1">
-                        {option.label}
-                      </span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Marker Border Width */}
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <label className="block text-sm font-medium text-gray-700">
-                  Marker Border Width
-                </label>
-                <span className="text-sm text-gray-500">
-                  {style.markerBorderOptions?.width || 2}px
-                </span>
-              </div>
-              <input
-                type="range"
-                min="1"
-                max="5"
-                value={style.markerBorderOptions?.width || 2}
-                onChange={(e) =>
-                  handleNestedChange(
-                    "markerBorderOptions",
-                    "width",
-                    parseInt(e.target.value)
-                  )
-                }
-                className="w-full"
-              />
-              <div className="flex justify-between text-xs text-gray-500">
-                <span>1px</span>
-                <span>5px</span>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Markers Section */}
-      <div className="border rounded-lg overflow-hidden">
-        <button
-          onClick={() => toggleSection("markers")}
-          className="w-full px-4 py-2 bg-gray-50 hover:bg-gray-100 flex justify-between items-center"
-        >
-          <h3 className="text-sm font-medium text-gray-700">Markers</h3>
-          <svg
-            className={`w-5 h-5 transform transition-transform ${
-              sectionsOpen.markers ? "rotate-180" : ""
-            }`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 9l-7 7-7-7"
-            />
-          </svg>
-        </button>
-        {sectionsOpen.markers && (
-          <div className="p-4 space-y-4">
-            {/* Marker Border Style */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Marker Border Style
-              </label>
-              <select
-                value={style.markerBorderOptions?.style || "solid"}
-                onChange={(e) =>
-                  handleNestedChange(
-                    "markerBorderOptions",
-                    "style",
-                    e.target.value
-                  )
-                }
-                className="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="solid">Solid</option>
-                <option value="double">Double</option>
-                <option value="dotted">Dotted</option>
-                <option value="dashed">Dashed</option>
-              </select>
-            </div>
-
-            {/* ... other marker options ... */}
           </div>
         )}
       </div>
@@ -1421,26 +1222,30 @@ const QRGenerator = () => {
 
 const PresetGrid = ({ presets, selectedPreset, onSelect }) => {
   return (
-    <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+    <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-1.5">
       {presets.map((preset) => (
         <button
           key={preset.id}
           onClick={() => onSelect(preset.id)}
-          className={`p-2 rounded-lg border-2 transition-all ${
+          className={`p-1.5 rounded-lg border transition-all ${
             selectedPreset === preset.id
               ? "border-blue-500 bg-blue-50"
               : "border-gray-200 hover:border-gray-300"
           }`}
         >
           <div
-            className="w-full aspect-square rounded-lg mb-1 overflow-hidden"
-            style={{ backgroundColor: preset.style.backgroundColor }}
+            className="w-full aspect-square rounded-md mb-1 overflow-hidden"
+            style={{
+              backgroundColor: preset.style.backgroundColor,
+              maxWidth: "48px",
+              margin: "0 auto",
+            }}
           >
-            <div className="w-full h-full grid grid-cols-3 gap-1 p-1">
+            <div className="w-full h-full grid grid-cols-3 gap-0.5 p-0.5">
               {[...Array(9)].map((_, i) => (
                 <div
                   key={i}
-                  className="rounded-sm"
+                  className="rounded-[1px]"
                   style={{
                     backgroundColor:
                       i < 3
@@ -1449,13 +1254,13 @@ const PresetGrid = ({ presets, selectedPreset, onSelect }) => {
                         ? preset.style.cornerDotOptions.color
                         : preset.style.dotsOptions.color,
                     borderRadius:
-                      preset.style.dotsOptions.type === "dots" ? "50%" : "2px",
+                      preset.style.dotsOptions.type === "dots" ? "50%" : "1px",
                   }}
                 />
               ))}
             </div>
           </div>
-          <span className="text-xs font-medium text-gray-700 truncate block">
+          <span className="text-[10px] font-medium text-gray-700 truncate block text-center">
             {preset.name}
           </span>
         </button>
