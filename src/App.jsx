@@ -17,9 +17,11 @@ import {
   Circle,
   Triangle,
   Hexagon,
+  Printer,
 } from "lucide-react";
 import { QRCodeCanvas } from "qrcode.react";
 import QRCodeStyling from "qr-code-styling";
+import html2canvas from "html2canvas";
 
 // Form Components for each QR type
 const TextForm = ({ value, onChange }) => (
@@ -1153,6 +1155,7 @@ const QRGenerator = () => {
   const [qrType, setQrType] = useState("text");
   const [selectedPreset, setSelectedPreset] = useState("classic");
   const [qrStyle, setQrStyle] = useState(QRPresets[0].style);
+  const [isDownloadOpen, setIsDownloadOpen] = useState(false);
   const [sectionsOpen, setSectionsOpen] = useState({
     qrSettings: true,
     styleOptions: false,
@@ -1161,6 +1164,7 @@ const QRGenerator = () => {
   const qrRef = useRef(null);
   const qrCodeRef = useRef(null);
   const debounceTimeout = useRef(null);
+  const downloadMenuRef = useRef(null);
 
   // Debounce the QR data updates
   useEffect(() => {
@@ -1281,15 +1285,256 @@ const QRGenerator = () => {
     }
   }, [debouncedQrData, qrStyle]);
 
-  const downloadQR = () => {
-    if (qrCodeRef.current) {
-      const link = document.createElement("a");
-      link.download = `qr-code-${qrType}.png`;
-      link.href = qrCodeRef.current.toDataURL();
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+  // Add click outside handler
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        downloadMenuRef.current &&
+        !downloadMenuRef.current.contains(event.target)
+      ) {
+        setIsDownloadOpen(false);
+      }
     }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const downloadQR = (format = "png") => {
+    if (!qrRef.current) return;
+
+    const link = document.createElement("a");
+    const filename = `qr-code-${qrType}`;
+
+    if (format === "png") {
+      // Create a temporary container with proper styling
+      const tempContainer = document.createElement("div");
+      tempContainer.style.position = "fixed";
+      tempContainer.style.left = "-9999px";
+      tempContainer.style.top = "-9999px";
+      tempContainer.style.width = "400px";
+      tempContainer.style.height = "400px";
+      tempContainer.style.backgroundColor = qrStyle.backgroundColor;
+      tempContainer.style.padding = "20px";
+      tempContainer.style.display = "flex";
+      tempContainer.style.alignItems = "center";
+      tempContainer.style.justifyContent = "center";
+
+      // Clone the QR container
+      const qrContainer = qrRef.current.cloneNode(true);
+      qrContainer.style.width = "100%";
+      qrContainer.style.height = "100%";
+      tempContainer.appendChild(qrContainer);
+      document.body.appendChild(tempContainer);
+
+      // Use html2canvas with proper configuration
+      html2canvas(tempContainer, {
+        backgroundColor: qrStyle.backgroundColor,
+        scale: 2,
+        logging: false,
+        width: 400,
+        height: 400,
+        useCORS: true,
+        onclone: (clonedDoc) => {
+          const clonedContainer = clonedDoc.querySelector("div");
+          clonedContainer.style.position = "relative";
+          clonedContainer.style.left = "0";
+          clonedContainer.style.top = "0";
+        },
+      }).then((canvas) => {
+        link.download = `${filename}.png`;
+        link.href = canvas.toDataURL("image/png");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        document.body.removeChild(tempContainer);
+      });
+    } else if (format === "svg") {
+      const svgElement = qrRef.current.querySelector("svg");
+      if (svgElement) {
+        const svgContainer = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "svg"
+        );
+        svgContainer.setAttribute("width", "400");
+        svgContainer.setAttribute("height", "400");
+        svgContainer.setAttribute("viewBox", "0 0 400 400");
+
+        // Create background
+        const background = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "rect"
+        );
+        background.setAttribute("width", "100%");
+        background.setAttribute("height", "100%");
+        background.setAttribute("fill", qrStyle.backgroundColor);
+        svgContainer.appendChild(background);
+
+        // Create a group for the QR code and frame
+        const group = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "g"
+        );
+        group.setAttribute("transform", "translate(50, 50)");
+
+        if (qrStyle.frame?.enabled) {
+          const frameColor = qrStyle.frame.color || "#000000";
+
+          // Add frame
+          const frame = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "rect"
+          );
+          frame.setAttribute("width", "300");
+          frame.setAttribute("height", "300");
+          frame.setAttribute("fill", "none");
+          frame.setAttribute("stroke", frameColor);
+          frame.setAttribute("stroke-width", "16");
+          frame.setAttribute("rx", "16");
+          group.appendChild(frame);
+
+          // Add frame text if present
+          if (qrStyle.frame.text) {
+            const textGroup = document.createElementNS(
+              "http://www.w3.org/2000/svg",
+              "g"
+            );
+            textGroup.setAttribute("transform", "translate(150, 340)");
+
+            // Add text background pill
+            const textBg = document.createElementNS(
+              "http://www.w3.org/2000/svg",
+              "rect"
+            );
+            textBg.setAttribute("x", "-75");
+            textBg.setAttribute("y", "-15");
+            textBg.setAttribute("width", "150");
+            textBg.setAttribute("height", "30");
+            textBg.setAttribute("rx", "15");
+            textBg.setAttribute("fill", frameColor);
+            textGroup.appendChild(textBg);
+
+            // Add text
+            const text = document.createElementNS(
+              "http://www.w3.org/2000/svg",
+              "text"
+            );
+            text.setAttribute("text-anchor", "middle");
+            text.setAttribute("dominant-baseline", "middle");
+            text.setAttribute("fill", qrStyle.frame.textColor || "#FFFFFF");
+            text.setAttribute("font-family", qrStyle.frame.font || "system-ui");
+            text.setAttribute("font-size", "16");
+            text.textContent = qrStyle.frame.text;
+            textGroup.appendChild(text);
+            group.appendChild(textGroup);
+          }
+        }
+
+        // Add QR code
+        const qrClone = svgElement.cloneNode(true);
+        qrClone.setAttribute("width", "300");
+        qrClone.setAttribute("height", "300");
+        qrClone.setAttribute("x", "0");
+        qrClone.setAttribute("y", "0");
+        group.appendChild(qrClone);
+        svgContainer.appendChild(group);
+
+        const svgData = new XMLSerializer().serializeToString(svgContainer);
+        const svgBlob = new Blob([svgData], {
+          type: "image/svg+xml;charset=utf-8",
+        });
+        link.href = URL.createObjectURL(svgBlob);
+        link.download = `${filename}.svg`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
+      }
+    }
+  };
+
+  const printQR = () => {
+    const printWindow = window.open("", "_blank");
+    const qrCode = qrRef.current.cloneNode(true);
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Print QR Code</title>
+          <style>
+            body {
+              margin: 0;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              min-height: 100vh;
+              padding: 20px;
+              box-sizing: border-box;
+              background-color: ${qrStyle.backgroundColor};
+            }
+            .qr-container {
+              text-align: center;
+              position: relative;
+              width: 500px;
+              padding: 20px;
+            }
+            .qr-code {
+              width: 100%;
+              position: relative;
+            }
+            .qr-info {
+              font-family: system-ui, -apple-system, sans-serif;
+              color: #374151;
+              margin-top: 48px;
+            }
+            .frame-text {
+              position: absolute;
+              left: 50%;
+              bottom: -36px;
+              transform: translateX(-50%);
+              background-color: ${qrStyle.frame?.color || "#000000"};
+              color: ${qrStyle.frame?.textColor || "#FFFFFF"};
+              padding: 8px 24px;
+              border-radius: 24px;
+              font-size: 16px;
+              font-weight: 500;
+              white-space: nowrap;
+              font-family: ${qrStyle.frame?.font || "system-ui"};
+            }
+            @media print {
+              body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="qr-container">
+            <div class="qr-code">${qrCode.innerHTML}</div>
+            <div class="qr-info">
+              <p style="font-size: 18px; font-weight: 500; margin: 0;">Scan this QR code</p>
+              ${
+                qrType === "url"
+                  ? `<p style="color: #6B7280; margin: 4px 0 0 0;">${qrData}</p>`
+                  : ""
+              }
+            </div>
+          </div>
+          <script>
+            window.onload = () => {
+              window.print();
+              window.onafterprint = () => window.close();
+            }
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
   };
 
   const shareQR = async () => {
@@ -1586,15 +1831,39 @@ const QRGenerator = () => {
               </div>
             </div>
 
-            <div className="flex justify-center space-x-4 mt-6">
-              <button
-                onClick={downloadQR}
-                disabled={!debouncedQrData}
-                className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                <Download className="w-5 h-5 mr-2" />
-                <span>Download</span>
-              </button>
+            <div className="flex justify-center space-x-4 mt-12">
+              <div className="relative inline-block" ref={downloadMenuRef}>
+                <button
+                  onClick={() => setIsDownloadOpen(!isDownloadOpen)}
+                  disabled={!debouncedQrData}
+                  className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <Download className="w-5 h-5 mr-2" />
+                  <span>Download</span>
+                </button>
+                {debouncedQrData && isDownloadOpen && (
+                  <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 border border-gray-200">
+                    <button
+                      onClick={() => {
+                        downloadQR("png");
+                        setIsDownloadOpen(false);
+                      }}
+                      className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 text-left"
+                    >
+                      Download as PNG
+                    </button>
+                    <button
+                      onClick={() => {
+                        downloadQR("svg");
+                        setIsDownloadOpen(false);
+                      }}
+                      className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 text-left"
+                    >
+                      Download as SVG
+                    </button>
+                  </div>
+                )}
+              </div>
               <button
                 onClick={shareQR}
                 disabled={!debouncedQrData || !navigator.share}
@@ -1602,6 +1871,14 @@ const QRGenerator = () => {
               >
                 <Share2 className="w-5 h-5 mr-2" />
                 <span>Share</span>
+              </button>
+              <button
+                onClick={printQR}
+                disabled={!debouncedQrData}
+                className="flex items-center px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <Printer className="w-5 h-5 mr-2" />
+                <span>Print</span>
               </button>
             </div>
           </div>
