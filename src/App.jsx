@@ -9,8 +9,283 @@ import {
   Wifi,
   Globe,
   Type,
+  Lock,
+  User,
+  MessageCircle,
 } from "lucide-react";
 import QRCode from "qrcode";
+
+// Form Components for each QR type
+const TextForm = ({ value, onChange }) => (
+  <div className="space-y-4">
+    <textarea
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder="Enter your text message..."
+      className="w-full pl-4 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[100px]"
+    />
+  </div>
+);
+
+const URLForm = ({ value, onChange }) => {
+  const [isValid, setIsValid] = useState(true);
+
+  const validateURL = (url) => {
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const handleChange = (url) => {
+    setIsValid(url === "" || validateURL(url));
+    onChange(url);
+  };
+
+  return (
+    <div className="space-y-2">
+      <input
+        type="url"
+        value={value}
+        onChange={(e) => handleChange(e.target.value)}
+        placeholder="https://example.com"
+        className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+          !isValid ? "border-red-500" : "border-gray-300"
+        }`}
+      />
+      {!isValid && (
+        <p className="text-sm text-red-500">Please enter a valid URL</p>
+      )}
+    </div>
+  );
+};
+
+const EmailForm = ({ value, onChange }) => {
+  const [formData, setFormData] = useState({
+    email: "",
+    subject: "",
+    body: "",
+  });
+
+  const handleChange = (field, value) => {
+    const newData = { ...formData, [field]: value };
+    setFormData(newData);
+    onChange(
+      `mailto:${newData.email}${
+        newData.subject ? "?subject=" + encodeURIComponent(newData.subject) : ""
+      }${newData.body ? "&body=" + encodeURIComponent(newData.body) : ""}`
+    );
+  };
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Email Address
+        </label>
+        <input
+          type="email"
+          value={formData.email}
+          onChange={(e) => handleChange("email", e.target.value)}
+          placeholder="recipient@example.com"
+          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Subject (optional)
+        </label>
+        <input
+          type="text"
+          value={formData.subject}
+          onChange={(e) => handleChange("subject", e.target.value)}
+          placeholder="Email subject"
+          className="w-full pl-4 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Message (optional)
+        </label>
+        <textarea
+          value={formData.body}
+          onChange={(e) => handleChange("body", e.target.value)}
+          placeholder="Email body"
+          className="w-full pl-4 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[100px]"
+        />
+      </div>
+    </div>
+  );
+};
+
+const PhoneForm = ({ value, onChange }) => {
+  const [isValid, setIsValid] = useState(true);
+
+  const validatePhone = (phone) => {
+    const phoneRegex = /^\+?[\d\s-()]{10,}$/;
+    return phoneRegex.test(phone);
+  };
+
+  const handleChange = (phone) => {
+    setIsValid(phone === "" || validatePhone(phone));
+    onChange(phone);
+  };
+
+  return (
+    <div className="space-y-2">
+      <input
+        type="tel"
+        value={value}
+        onChange={(e) => handleChange(e.target.value)}
+        placeholder="+1 (234) 567-8900"
+        className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+          !isValid ? "border-red-500" : "border-gray-300"
+        }`}
+      />
+      {!isValid && (
+        <p className="text-sm text-red-500">
+          Please enter a valid phone number
+        </p>
+      )}
+    </div>
+  );
+};
+
+const SMSForm = ({ value, onChange }) => {
+  const [formData, setFormData] = useState({
+    phone: "",
+    message: "",
+  });
+
+  const handleChange = (field, value) => {
+    const newData = { ...formData, [field]: value };
+    setFormData(newData);
+    onChange(
+      `sms:${newData.phone}${
+        newData.message ? "?body=" + encodeURIComponent(newData.message) : ""
+      }`
+    );
+  };
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Phone Number
+        </label>
+        <div className="relative">
+          <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <input
+            type="tel"
+            value={formData.phone}
+            onChange={(e) => handleChange("phone", e.target.value)}
+            placeholder="+1 (234) 567-8900"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Message (optional)
+        </label>
+        <div className="relative">
+          <MessageCircle className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+          <textarea
+            value={formData.message}
+            onChange={(e) => handleChange("message", e.target.value)}
+            placeholder="Enter your message"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[100px]"
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const WiFiForm = ({ value, onChange }) => {
+  const [formData, setFormData] = useState({
+    ssid: "",
+    password: "",
+    encryption: "WPA",
+    hidden: false,
+  });
+
+  const handleChange = (field, value) => {
+    const newData = { ...formData, [field]: value };
+    setFormData(newData);
+    onChange(
+      `WIFI:T:${newData.encryption};S:${newData.ssid};P:${newData.password};H:${
+        newData.hidden ? "true" : "false"
+      };;`
+    );
+  };
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Network Name (SSID)
+        </label>
+        <div className="relative">
+          <Wifi className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <input
+            type="text"
+            value={formData.ssid}
+            onChange={(e) => handleChange("ssid", e.target.value)}
+            placeholder="WiFi network name"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Password
+        </label>
+        <div className="relative">
+          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <input
+            type="password"
+            value={formData.password}
+            onChange={(e) => handleChange("password", e.target.value)}
+            placeholder="WiFi password"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Encryption Type
+        </label>
+        <select
+          value={formData.encryption}
+          onChange={(e) => handleChange("encryption", e.target.value)}
+          className="w-full pl-4 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        >
+          <option value="WPA">WPA/WPA2</option>
+          <option value="WEP">WEP</option>
+          <option value="nopass">No Password</option>
+        </select>
+      </div>
+      <div className="flex items-center">
+        <input
+          type="checkbox"
+          id="hidden-network"
+          checked={formData.hidden}
+          onChange={(e) => handleChange("hidden", e.target.checked)}
+          className="h-4 w-4 text-blue-500 focus:ring-blue-500 border-gray-300 rounded"
+        />
+        <label
+          htmlFor="hidden-network"
+          className="ml-2 block text-sm text-gray-700"
+        >
+          Hidden Network
+        </label>
+      </div>
+    </div>
+  );
+};
 
 const QRGenerator = () => {
   const [qrData, setQrData] = useState("");
@@ -23,62 +298,45 @@ const QRGenerator = () => {
       value: "text",
       label: "Text",
       icon: Type,
-      placeholder: "Enter any text...",
+      component: TextForm,
     },
     {
       value: "url",
       label: "URL",
       icon: Globe,
-      placeholder: "Enter website URL...",
+      component: URLForm,
     },
     {
       value: "email",
       label: "Email",
       icon: Mail,
-      placeholder: "Enter email address...",
+      component: EmailForm,
     },
     {
       value: "tel",
-      label: "Phone Number",
+      label: "Phone",
       icon: Phone,
-      placeholder: "Enter phone number...",
+      component: PhoneForm,
     },
     {
       value: "sms",
       label: "SMS",
       icon: MessageSquare,
-      placeholder: "Enter phone number...",
+      component: SMSForm,
     },
     {
       value: "wifi",
       label: "WiFi",
       icon: Wifi,
-      placeholder: "Enter SSID,password...",
+      component: WiFiForm,
     },
   ];
-
-  const formatQRData = (type, data) => {
-    switch (type) {
-      case "email":
-        return `mailto:${data}`;
-      case "tel":
-        return `tel:${data}`;
-      case "sms":
-        return `sms:${data}`;
-      case "wifi":
-        const [ssid, password] = data.split(",");
-        return `WIFI:T:WPA;S:${ssid};P:${password};;`;
-      default:
-        return data;
-    }
-  };
 
   useEffect(() => {
     const generateQR = async () => {
       try {
-        const formattedData = formatQRData(qrType, qrData);
-        if (formattedData) {
-          const url = await QRCode.toDataURL(formattedData, {
+        if (qrData) {
+          const url = await QRCode.toDataURL(qrData, {
             width: 400,
             margin: 2,
             color: {
@@ -87,14 +345,17 @@ const QRGenerator = () => {
             },
           });
           setQrImage(url);
+        } else {
+          setQrImage("");
         }
       } catch (err) {
         console.error("Error generating QR code:", err);
+        setQrImage("");
       }
     };
 
     generateQR();
-  }, [qrData, qrType]);
+  }, [qrData]);
 
   const downloadQR = () => {
     if (qrImage) {
@@ -127,7 +388,7 @@ const QRGenerator = () => {
   };
 
   const selectedType = qrTypes.find((type) => type.value === qrType);
-  const TypeIcon = selectedType?.icon;
+  const FormComponent = selectedType?.component;
 
   return (
     <div className="max-w-5xl mx-auto p-6 space-y-8">
@@ -149,7 +410,10 @@ const QRGenerator = () => {
                   return (
                     <button
                       key={type.value}
-                      onClick={() => setQrType(type.value)}
+                      onClick={() => {
+                        setQrType(type.value);
+                        setQrData("");
+                      }}
                       className={`flex items-center justify-center p-3 rounded-lg border-2 transition-all ${
                         qrType === type.value
                           ? "border-blue-500 bg-blue-50 text-blue-600"
@@ -166,26 +430,10 @@ const QRGenerator = () => {
 
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
-                {selectedType?.label} Content
+                {selectedType?.label} Details
               </label>
-              <div className="relative">
-                {TypeIcon && (
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <TypeIcon className="h-5 w-5 text-gray-400" />
-                  </div>
-                )}
-                <input
-                  type="text"
-                  value={qrData}
-                  onChange={(e) => setQrData(e.target.value)}
-                  placeholder={selectedType?.placeholder}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              {qrType === "wifi" && (
-                <p className="text-sm text-gray-500">
-                  Format: NetworkName,Password
-                </p>
+              {FormComponent && (
+                <FormComponent value={qrData} onChange={setQrData} />
               )}
             </div>
           </div>
