@@ -33,6 +33,7 @@ import html2canvas from "html2canvas";
 import { Features, HowItWorks, FAQ, Footer } from "./components/Sections";
 import SEO from "./components/SEO";
 import FAQPage from "./pages/FAQ";
+import UseCasesPage from "./pages/UseCases";
 
 // Form Components for each QR type
 const TextForm = ({ value, onChange }) => (
@@ -2050,6 +2051,9 @@ const Navigation = () => (
           </div>
         </Link>
         <div className="hidden md:flex items-center space-x-8">
+          <Link to="/use-cases" className="text-gray-600 hover:text-blue-500">
+            Use Cases
+          </Link>
           <Link
             to="/generate-free-qr-code-for-url"
             className="text-gray-600 hover:text-blue-500"
@@ -2156,6 +2160,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/faq" element={<FAQPage />} />
+        <Route path="/use-cases" element={<UseCasesPage />} />
         <Route
           path="/generate-free-qr-code-for-url"
           element={
