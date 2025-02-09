@@ -1309,48 +1309,64 @@ const QRGenerator = () => {
     const filename = `qr-code-${qrType}`;
 
     if (format === "png") {
-      // Create a temporary container with proper styling
+      // Create a temporary container
       const tempContainer = document.createElement("div");
       tempContainer.style.position = "fixed";
       tempContainer.style.left = "-9999px";
-      tempContainer.style.top = "-9999px";
+      tempContainer.style.top = "0";
       tempContainer.style.width = "400px";
       tempContainer.style.height = "400px";
       tempContainer.style.backgroundColor = qrStyle.backgroundColor;
       tempContainer.style.padding = "20px";
-      tempContainer.style.display = "flex";
-      tempContainer.style.alignItems = "center";
-      tempContainer.style.justifyContent = "center";
+      tempContainer.style.zIndex = "-1";
 
-      // Clone the QR container
+      // Clone the QR container and its contents
       const qrContainer = qrRef.current.cloneNode(true);
       qrContainer.style.width = "100%";
       qrContainer.style.height = "100%";
+      qrContainer.style.opacity = "1";
+      qrContainer.style.visibility = "visible";
+
+      // Ensure all child elements are visible
+      qrContainer.querySelectorAll("*").forEach((el) => {
+        el.style.opacity = "1";
+        el.style.visibility = "visible";
+      });
+
       tempContainer.appendChild(qrContainer);
       document.body.appendChild(tempContainer);
 
-      // Use html2canvas with proper configuration
-      html2canvas(tempContainer, {
-        backgroundColor: qrStyle.backgroundColor,
-        scale: 2,
-        logging: false,
-        width: 400,
-        height: 400,
-        useCORS: true,
-        onclone: (clonedDoc) => {
-          const clonedContainer = clonedDoc.querySelector("div");
-          clonedContainer.style.position = "relative";
-          clonedContainer.style.left = "0";
-          clonedContainer.style.top = "0";
-        },
-      }).then((canvas) => {
-        link.download = `${filename}.png`;
-        link.href = canvas.toDataURL("image/png");
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        document.body.removeChild(tempContainer);
-      });
+      // Add a small delay to ensure proper rendering
+      setTimeout(() => {
+        html2canvas(tempContainer, {
+          backgroundColor: qrStyle.backgroundColor,
+          scale: 2,
+          logging: false,
+          width: 400,
+          height: 400,
+          useCORS: true,
+          allowTaint: true,
+          onclone: (clonedDoc) => {
+            const clonedContainer = clonedDoc.querySelector("div");
+            if (clonedContainer) {
+              clonedContainer.style.opacity = "1";
+              clonedContainer.style.visibility = "visible";
+              // Ensure all elements in the clone are visible
+              clonedContainer.querySelectorAll("*").forEach((el) => {
+                el.style.opacity = "1";
+                el.style.visibility = "visible";
+              });
+            }
+          },
+        }).then((canvas) => {
+          link.download = `${filename}.png`;
+          link.href = canvas.toDataURL("image/png");
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          document.body.removeChild(tempContainer);
+        });
+      }, 100); // Small delay to ensure rendering
     } else if (format === "svg") {
       const svgElement = qrRef.current.querySelector("svg");
       if (svgElement) {
@@ -1403,16 +1419,21 @@ const QRGenerator = () => {
             );
             textGroup.setAttribute("transform", "translate(150, 340)");
 
+            // Calculate text width for background pill
+            const textWidth = qrStyle.frame.text.length * 10 + 40; // Approximate width based on text length
+            const pillWidth = Math.max(textWidth, 120);
+            const pillHeight = 36;
+
             // Add text background pill
             const textBg = document.createElementNS(
               "http://www.w3.org/2000/svg",
               "rect"
             );
-            textBg.setAttribute("x", "-75");
-            textBg.setAttribute("y", "-15");
-            textBg.setAttribute("width", "150");
-            textBg.setAttribute("height", "30");
-            textBg.setAttribute("rx", "15");
+            textBg.setAttribute("x", -pillWidth / 2);
+            textBg.setAttribute("y", -pillHeight / 2);
+            textBg.setAttribute("width", pillWidth);
+            textBg.setAttribute("height", pillHeight);
+            textBg.setAttribute("rx", pillHeight / 2);
             textBg.setAttribute("fill", frameColor);
             textGroup.appendChild(textBg);
 
@@ -1426,6 +1447,7 @@ const QRGenerator = () => {
             text.setAttribute("fill", qrStyle.frame.textColor || "#FFFFFF");
             text.setAttribute("font-family", qrStyle.frame.font || "system-ui");
             text.setAttribute("font-size", "16");
+            text.setAttribute("font-weight", "500");
             text.textContent = qrStyle.frame.text;
             textGroup.appendChild(text);
             group.appendChild(textGroup);
