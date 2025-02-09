@@ -1,5 +1,13 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link,
+  useParams,
+  useNavigate,
+} from "react-router-dom";
+import {
   Share2,
   Download,
   QrCode,
@@ -22,6 +30,7 @@ import {
 import { QRCodeCanvas } from "qrcode.react";
 import QRCodeStyling from "qr-code-styling";
 import html2canvas from "html2canvas";
+import { Features, HowItWorks, FAQ, Footer } from "./components/Sections";
 
 // Form Components for each QR type
 const TextForm = ({ value, onChange }) => (
@@ -1149,10 +1158,10 @@ const CustomStyleForm = ({ style, onChange }) => {
   );
 };
 
-const QRGenerator = () => {
+const QRGenerator = ({ defaultType }) => {
   const [qrData, setQrData] = useState("");
   const [debouncedQrData, setDebouncedQrData] = useState("");
-  const [qrType, setQrType] = useState("text");
+  const [qrType, setQrType] = useState(defaultType || "text");
   const [selectedPreset, setSelectedPreset] = useState("classic");
   const [qrStyle, setQrStyle] = useState(QRPresets[0].style);
   const [isDownloadOpen, setIsDownloadOpen] = useState(false);
@@ -1959,279 +1968,206 @@ const PresetGrid = ({ presets, selectedPreset, onSelect }) => {
   );
 };
 
-const App = () => {
+const QRTypeHero = ({ title, description, type }) => {
+  const navigate = useNavigate();
+
+  return (
+    <section className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center">
+          <h1 className="text-4xl md:text-5xl font-bold mb-6">{title}</h1>
+          <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
+            {description}
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <button
+              onClick={() => {
+                const element = document.getElementById("generator");
+                element?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+            >
+              Create QR Code Now
+            </button>
+            <Link
+              to="/"
+              className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors"
+            >
+              View All Types
+            </Link>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const QRTypeRoute = ({ type, title, description }) => {
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navigation */}
-      <nav className="bg-white shadow-sm border-b sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <QrCode className="w-8 h-8 text-blue-500 mr-3" />
-              <div className="text-xl font-bold text-gray-800">
-                QR Code Generator
-              </div>
-            </div>
-            <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-gray-600 hover:text-blue-500">
-                Features
-              </a>
-              <a
-                href="#how-it-works"
-                className="text-gray-600 hover:text-blue-500"
-              >
-                How It Works
-              </a>
-              <a href="#faq" className="text-gray-600 hover:text-blue-500">
-                FAQ
-              </a>
-              <a
-                href="https://github.com/yourusername/qr-gen"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-600 hover:text-blue-500"
-              >
-                GitHub
-              </a>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              Create Beautiful QR Codes in Seconds
-            </h1>
-            <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
-              Generate customizable QR codes for URLs, text, WiFi, and more. No
-              sign-up required.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <a
-                href="#generator"
-                className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
-              >
-                Create QR Code
-              </a>
-              <a
-                href="#features"
-                className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors"
-              >
-                Learn More
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
+      <Navigation />
+      <QRTypeHero title={title} description={description} type={type} />
       <main className="py-10" id="generator">
-        <QRGenerator />
+        <QRGenerator defaultType={type} />
       </main>
-
-      {/* Features Section */}
-      <section id="features" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center mb-12">Features</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center p-6">
-              <div className="bg-blue-100 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Palette className="w-6 h-6 text-blue-600" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">
-                Customizable Design
-              </h3>
-              <p className="text-gray-600">
-                Choose from various styles, colors, and patterns to match your
-                brand.
-              </p>
-            </div>
-            <div className="text-center p-6">
-              <div className="bg-blue-100 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Download className="w-6 h-6 text-blue-600" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Multiple Formats</h3>
-              <p className="text-gray-600">
-                Download your QR codes in PNG or SVG format for any use case.
-              </p>
-            </div>
-            <div className="text-center p-6">
-              <div className="bg-blue-100 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Share2 className="w-6 h-6 text-blue-600" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Easy Sharing</h3>
-              <p className="text-gray-600">
-                Share your QR codes directly or download them for later use.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works Section */}
-      <section id="how-it-works" className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="relative">
-              <div className="bg-white p-6 rounded-lg shadow-sm">
-                <span className="absolute -top-4 -left-4 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold">
-                  1
-                </span>
-                <h3 className="text-xl font-semibold mb-2">
-                  Choose Content Type
-                </h3>
-                <p className="text-gray-600">
-                  Select the type of content you want to encode in your QR code.
-                </p>
-              </div>
-            </div>
-            <div className="relative">
-              <div className="bg-white p-6 rounded-lg shadow-sm">
-                <span className="absolute -top-4 -left-4 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold">
-                  2
-                </span>
-                <h3 className="text-xl font-semibold mb-2">Customize Design</h3>
-                <p className="text-gray-600">
-                  Personalize your QR code with colors, patterns, and frames.
-                </p>
-              </div>
-            </div>
-            <div className="relative">
-              <div className="bg-white p-6 rounded-lg shadow-sm">
-                <span className="absolute -top-4 -left-4 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold">
-                  3
-                </span>
-                <h3 className="text-xl font-semibold mb-2">Download & Share</h3>
-                <p className="text-gray-600">
-                  Get your QR code in your preferred format and start sharing.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ Section */}
-      <section id="faq" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center mb-12">
-            Frequently Asked Questions
-          </h2>
-          <div className="max-w-3xl mx-auto space-y-6">
-            <div className="bg-gray-50 p-6 rounded-lg">
-              <h3 className="text-lg font-semibold mb-2">
-                What types of QR codes can I create?
-              </h3>
-              <p className="text-gray-600">
-                You can create QR codes for URLs, plain text, email addresses,
-                phone numbers, SMS messages, and WiFi networks.
-              </p>
-            </div>
-            <div className="bg-gray-50 p-6 rounded-lg">
-              <h3 className="text-lg font-semibold mb-2">
-                Are the QR codes free to use?
-              </h3>
-              <p className="text-gray-600">
-                Yes, all QR codes generated are completely free to use for both
-                personal and commercial purposes.
-              </p>
-            </div>
-            <div className="bg-gray-50 p-6 rounded-lg">
-              <h3 className="text-lg font-semibold mb-2">
-                What's the best format to download?
-              </h3>
-              <p className="text-gray-600">
-                PNG is best for digital use, while SVG is ideal for print
-                materials as it can be scaled without losing quality.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Enhanced Footer */}
-      <footer className="bg-gray-900 text-white">
-        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div className="col-span-2">
-              <div className="flex items-center mb-4">
-                <QrCode className="w-8 h-8 text-blue-400 mr-3" />
-                <span className="text-xl font-bold">QR Code Generator</span>
-              </div>
-              <p className="text-gray-400 mb-4">
-                Create beautiful, customizable QR codes for your business or
-                personal use. Free, fast, and no sign-up required.
-              </p>
-              <div className="flex space-x-4">
-                <a href="#" className="text-gray-400 hover:text-white">
-                  <span className="sr-only">Twitter</span>
-                  {/* Add social media icons here */}
-                </a>
-              </div>
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold uppercase tracking-wider mb-4">
-                Quick Links
-              </h3>
-              <ul className="space-y-3">
-                <li>
-                  <a
-                    href="#features"
-                    className="text-gray-400 hover:text-white"
-                  >
-                    Features
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#how-it-works"
-                    className="text-gray-400 hover:text-white"
-                  >
-                    How It Works
-                  </a>
-                </li>
-                <li>
-                  <a href="#faq" className="text-gray-400 hover:text-white">
-                    FAQ
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold uppercase tracking-wider mb-4">
-                Legal
-              </h3>
-              <ul className="space-y-3">
-                <li>
-                  <a href="#" className="text-gray-400 hover:text-white">
-                    Privacy Policy
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-400 hover:text-white">
-                    Terms of Service
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-400 hover:text-white">
-                    Contact
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center">
-            <p className="text-gray-400">
-              © {new Date().getFullYear()} QR Code Generator. All rights
-              reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Features />
+      <HowItWorks />
+      <FAQ />
+      <Footer />
     </div>
+  );
+};
+
+// Split existing sections into components
+const Navigation = () => (
+  <nav className="bg-white shadow-sm border-b sticky top-0 z-50">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="flex justify-between h-16">
+        <Link to="/" className="flex items-center">
+          <QrCode className="w-8 h-8 text-blue-500 mr-3" />
+          <div className="text-xl font-bold text-gray-800">
+            QR Code Generator
+          </div>
+        </Link>
+        <div className="hidden md:flex items-center space-x-8">
+          <Link
+            to="/generate-free-qr-code-for-url"
+            className="text-gray-600 hover:text-blue-500"
+          >
+            URL QR Code
+          </Link>
+          <Link
+            to="/generate-free-qr-code-for-text"
+            className="text-gray-600 hover:text-blue-500"
+          >
+            Text QR Code
+          </Link>
+          <Link
+            to="/generate-free-qr-code-for-wifi"
+            className="text-gray-600 hover:text-blue-500"
+          >
+            WiFi QR Code
+          </Link>
+          <a href="#faq" className="text-gray-600 hover:text-blue-500">
+            FAQ
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+);
+
+const MainHero = () => (
+  <section className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-20">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="text-center">
+        <h1 className="text-4xl md:text-5xl font-bold mb-6">
+          Create Beautiful QR Codes in Seconds
+        </h1>
+        <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
+          Generate customizable QR codes for URLs, text, WiFi, and more. No
+          sign-up required.
+        </p>
+        <div className="flex flex-wrap justify-center gap-4">
+          <a
+            href="#generator"
+            className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+          >
+            Create QR Code
+          </a>
+          <a
+            href="#features"
+            className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors"
+          >
+            Learn More
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+const HomePage = () => (
+  <div className="min-h-screen bg-gray-50">
+    <Navigation />
+    <MainHero />
+    <main className="py-10" id="generator">
+      <QRGenerator />
+    </main>
+    <Features />
+    <HowItWorks />
+    <FAQ />
+    <Footer />
+  </div>
+);
+
+const App = () => {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route
+          path="/generate-free-qr-code-for-url"
+          element={
+            <QRTypeRoute
+              type="url"
+              title="Generate Free QR Code for URL"
+              description="Create a custom QR code for your website or any URL. Customize colors, add frames, and download in multiple formats."
+            />
+          }
+        />
+        <Route
+          path="/generate-free-qr-code-for-text"
+          element={
+            <QRTypeRoute
+              type="text"
+              title="Generate Free QR Code for Text"
+              description="Convert any text into a QR code. Perfect for messages, quotes, or any text content you want to share."
+            />
+          }
+        />
+        <Route
+          path="/generate-free-qr-code-for-email"
+          element={
+            <QRTypeRoute
+              type="email"
+              title="Generate Free QR Code for Email"
+              description="Create a QR code that opens email composition with pre-filled recipient, subject, and body text."
+            />
+          }
+        />
+        <Route
+          path="/generate-free-qr-code-for-phone"
+          element={
+            <QRTypeRoute
+              type="tel"
+              title="Generate Free QR Code for Phone Number"
+              description="Generate a QR code that instantly dials your phone number when scanned."
+            />
+          }
+        />
+        <Route
+          path="/generate-free-qr-code-for-sms"
+          element={
+            <QRTypeRoute
+              type="sms"
+              title="Generate Free QR Code for SMS"
+              description="Create a QR code that opens SMS composition with pre-filled message and recipient."
+            />
+          }
+        />
+        <Route
+          path="/generate-free-qr-code-for-wifi"
+          element={
+            <QRTypeRoute
+              type="wifi"
+              title="Generate Free QR Code for WiFi"
+              description="Share your WiFi network details securely with a QR code. Instant connection when scanned."
+            />
+          }
+        />
+      </Routes>
+    </Router>
   );
 };
 
