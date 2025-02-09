@@ -1,5 +1,6 @@
 import React from "react";
 import { QrCode, Palette, Download, Share2 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const Features = () => (
   <section id="features" className="py-20 bg-white">
@@ -134,11 +135,6 @@ export const Footer = () => (
             Create beautiful, customizable QR codes for your business or
             personal use. Free, fast, and no sign-up required.
           </p>
-          <div className="flex space-x-4">
-            <a href="#" className="text-gray-400 hover:text-white">
-              <span className="sr-only">Twitter</span>
-            </a>
-          </div>
         </div>
         <div>
           <h3 className="text-sm font-semibold uppercase tracking-wider mb-4">
@@ -159,9 +155,9 @@ export const Footer = () => (
               </a>
             </li>
             <li>
-              <a href="#faq" className="text-gray-400 hover:text-white">
+              <Link to="/faq" className="text-gray-400 hover:text-white">
                 FAQ
-              </a>
+              </Link>
             </li>
           </ul>
         </div>
@@ -171,19 +167,22 @@ export const Footer = () => (
           </h3>
           <ul className="space-y-3">
             <li>
-              <a href="#" className="text-gray-400 hover:text-white">
+              <Link
+                to="/privacy-policy"
+                className="text-gray-400 hover:text-white"
+              >
                 Privacy Policy
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="text-gray-400 hover:text-white">
+              <Link to="/terms" className="text-gray-400 hover:text-white">
                 Terms of Service
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="text-gray-400 hover:text-white">
+              <Link to="/contact" className="text-gray-400 hover:text-white">
                 Contact
-              </a>
+              </Link>
             </li>
           </ul>
         </div>

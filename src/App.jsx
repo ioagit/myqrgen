@@ -31,6 +31,8 @@ import { QRCodeCanvas } from "qrcode.react";
 import QRCodeStyling from "qr-code-styling";
 import html2canvas from "html2canvas";
 import { Features, HowItWorks, FAQ, Footer } from "./components/Sections";
+import SEO from "./components/SEO";
+import FAQPage from "./pages/FAQ";
 
 // Form Components for each QR type
 const TextForm = ({ value, onChange }) => (
@@ -537,7 +539,6 @@ const QRPresets = [
       cornerDotOptions: { type: "dot", color: "#065F46" },
       backgroundColor: "#ECFDF5",
       frame: {
-        enabled: false,
         enabled: true,
         text: "Scan me",
         color: "#047857",
@@ -2003,8 +2004,27 @@ const QRTypeHero = ({ title, description, type }) => {
 };
 
 const QRTypeRoute = ({ type, title, description }) => {
+  const typeSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: title,
+    applicationCategory: "UtilityApplication",
+    description: description,
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+    },
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
+      <SEO
+        title={title}
+        description={description}
+        canonicalUrl={`/generate-free-qr-code-for-${type}`}
+        schema={typeSchema}
+      />
       <Navigation />
       <QRTypeHero title={title} description={description} type={type} />
       <main className="py-10" id="generator">
@@ -2048,9 +2068,9 @@ const Navigation = () => (
           >
             WiFi QR Code
           </Link>
-          <a href="#faq" className="text-gray-600 hover:text-blue-500">
+          <Link to="/faq" className="text-gray-600 hover:text-blue-500">
             FAQ
-          </a>
+          </Link>
         </div>
       </div>
     </div>
@@ -2087,25 +2107,55 @@ const MainHero = () => (
   </section>
 );
 
-const HomePage = () => (
-  <div className="min-h-screen bg-gray-50">
-    <Navigation />
-    <MainHero />
-    <main className="py-10" id="generator">
-      <QRGenerator />
-    </main>
-    <Features />
-    <HowItWorks />
-    <FAQ />
-    <Footer />
-  </div>
-);
+const HomePage = () => {
+  const homeSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: "QR Code Generator",
+    applicationCategory: "UtilityApplication",
+    description:
+      "Free online QR code generator. Create custom QR codes for URLs, text, WiFi, and more with our easy-to-use tool.",
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+    },
+    featureList: [
+      "Multiple QR code types support",
+      "Customizable design options",
+      "Free to use",
+      "No registration required",
+      "High-quality downloads in PNG and SVG formats",
+    ],
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <SEO
+        title="Free QR Code Generator: Create Custom QR Codes Online"
+        description="Generate custom QR codes for URLs, text, WiFi, and more. Free online QR code generator with advanced customization options. No sign-up required."
+        canonicalUrl="/"
+        schema={homeSchema}
+      />
+      <Navigation />
+      <MainHero />
+      <main className="py-10" id="generator">
+        <QRGenerator />
+      </main>
+      <Features />
+      <HowItWorks />
+      <FAQ />
+      <Footer />
+    </div>
+  );
+};
 
 const App = () => {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/faq" element={<FAQPage />} />
         <Route
           path="/generate-free-qr-code-for-url"
           element={
