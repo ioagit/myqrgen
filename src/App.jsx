@@ -26,6 +26,17 @@ import {
   Triangle,
   Hexagon,
   Printer,
+  Calendar,
+  FileText,
+  Youtube,
+  Video,
+  Instagram,
+  Facebook,
+  Linkedin,
+  Store,
+  CreditCard,
+  MessageCircleMore,
+  Contact2,
 } from "lucide-react";
 import { QRCodeCanvas } from "qrcode.react";
 import QRCodeStyling from "qr-code-styling";
@@ -302,6 +313,520 @@ const WiFiForm = ({ value, onChange }) => {
         >
           Hidden Network
         </label>
+      </div>
+    </div>
+  );
+};
+
+const VCardForm = ({ value, onChange }) => {
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    organization: "",
+    title: "",
+    email: "",
+    phone: "",
+    website: "",
+    address: "",
+  });
+
+  const handleChange = (field, value) => {
+    const newData = { ...formData, [field]: value };
+    setFormData(newData);
+
+    // Generate vCard format string
+    const vCard = [
+      "BEGIN:VCARD",
+      "VERSION:3.0",
+      `N:${newData.lastName};${newData.firstName};;;`,
+      `FN:${newData.firstName} ${newData.lastName}`,
+      newData.organization && `ORG:${newData.organization}`,
+      newData.title && `TITLE:${newData.title}`,
+      newData.phone && `TEL:${newData.phone}`,
+      newData.email && `EMAIL:${newData.email}`,
+      newData.website && `URL:${newData.website}`,
+      newData.address && `ADR:;;${newData.address};;;;`,
+      "END:VCARD",
+    ]
+      .filter(Boolean)
+      .join("\\n");
+
+    onChange(vCard);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            First Name
+          </label>
+          <input
+            type="text"
+            value={formData.firstName}
+            onChange={(e) => handleChange("firstName", e.target.value)}
+            placeholder="John"
+            className="w-full pl-4 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Last Name
+          </label>
+          <input
+            type="text"
+            value={formData.lastName}
+            onChange={(e) => handleChange("lastName", e.target.value)}
+            placeholder="Doe"
+            className="w-full pl-4 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Organization
+        </label>
+        <input
+          type="text"
+          value={formData.organization}
+          onChange={(e) => handleChange("organization", e.target.value)}
+          placeholder="Company Name"
+          className="w-full pl-4 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Job Title
+        </label>
+        <input
+          type="text"
+          value={formData.title}
+          onChange={(e) => handleChange("title", e.target.value)}
+          placeholder="Software Engineer"
+          className="w-full pl-4 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Email
+        </label>
+        <div className="relative">
+          <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <input
+            type="email"
+            value={formData.email}
+            onChange={(e) => handleChange("email", e.target.value)}
+            placeholder="john@example.com"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Phone
+        </label>
+        <div className="relative">
+          <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <input
+            type="tel"
+            value={formData.phone}
+            onChange={(e) => handleChange("phone", e.target.value)}
+            placeholder="+1 (234) 567-8900"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Website
+        </label>
+        <div className="relative">
+          <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <input
+            type="url"
+            value={formData.website}
+            onChange={(e) => handleChange("website", e.target.value)}
+            placeholder="https://example.com"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Address
+        </label>
+        <textarea
+          value={formData.address}
+          onChange={(e) => handleChange("address", e.target.value)}
+          placeholder="Enter your address"
+          className="w-full pl-4 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[80px]"
+        />
+      </div>
+    </div>
+  );
+};
+
+const WhatsAppForm = ({ value, onChange }) => {
+  const [formData, setFormData] = useState({
+    phone: "",
+    message: "",
+  });
+
+  const handleChange = (field, value) => {
+    const newData = { ...formData, [field]: value };
+    setFormData(newData);
+    onChange(
+      `https://wa.me/${newData.phone.replace(/\D/g, "")}${
+        newData.message ? "?text=" + encodeURIComponent(newData.message) : ""
+      }`
+    );
+  };
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          WhatsApp Number
+        </label>
+        <div className="relative">
+          <MessageCircleMore className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <input
+            type="tel"
+            value={formData.phone}
+            onChange={(e) => handleChange("phone", e.target.value)}
+            placeholder="+1 (234) 567-8900"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Message (optional)
+        </label>
+        <div className="relative">
+          <MessageCircle className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+          <textarea
+            value={formData.message}
+            onChange={(e) => handleChange("message", e.target.value)}
+            placeholder="Enter your message"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[100px]"
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const PayPalForm = ({ value, onChange }) => {
+  const [formData, setFormData] = useState({
+    username: "",
+    amount: "",
+    currency: "USD",
+  });
+
+  const handleChange = (field, value) => {
+    const newData = { ...formData, [field]: value };
+    setFormData(newData);
+    onChange(
+      `https://paypal.me/${newData.username}${
+        newData.amount ? "/" + newData.amount + newData.currency : ""
+      }`
+    );
+  };
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          PayPal.me Username
+        </label>
+        <div className="relative">
+          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <input
+            type="text"
+            value={formData.username}
+            onChange={(e) => handleChange("username", e.target.value)}
+            placeholder="username"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Amount (optional)
+        </label>
+        <div className="relative">
+          <CreditCard className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <input
+            type="number"
+            value={formData.amount}
+            onChange={(e) => handleChange("amount", e.target.value)}
+            placeholder="10.00"
+            min="0"
+            step="0.01"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Currency
+        </label>
+        <select
+          value={formData.currency}
+          onChange={(e) => handleChange("currency", e.target.value)}
+          className="w-full pl-4 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        >
+          <option value="USD">USD</option>
+          <option value="EUR">EUR</option>
+          <option value="GBP">GBP</option>
+          <option value="CAD">CAD</option>
+          <option value="AUD">AUD</option>
+        </select>
+      </div>
+    </div>
+  );
+};
+
+const EventForm = ({ value, onChange }) => {
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    location: "",
+    startDate: "",
+    startTime: "",
+    endDate: "",
+    endTime: "",
+  });
+
+  const handleChange = (field, value) => {
+    const newData = { ...formData, [field]: value };
+    setFormData(newData);
+
+    // Format dates for iCal
+    const formatDateTime = (date, time) => {
+      if (!date) return "";
+      const dt = new Date(`${date}T${time || "00:00"}`);
+      return dt.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+    };
+
+    const start = formatDateTime(newData.startDate, newData.startTime);
+    const end = formatDateTime(
+      newData.endDate || newData.startDate,
+      newData.endTime
+    );
+
+    // Generate iCal format string
+    const iCal = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "BEGIN:VEVENT",
+      `SUMMARY:${newData.title}`,
+      start && `DTSTART:${start}`,
+      end && `DTEND:${end}`,
+      newData.location && `LOCATION:${newData.location}`,
+      newData.description && `DESCRIPTION:${newData.description}`,
+      "END:VEVENT",
+      "END:VCALENDAR",
+    ]
+      .filter(Boolean)
+      .join("\\n");
+
+    onChange(iCal);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Event Title
+        </label>
+        <div className="relative">
+          <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <input
+            type="text"
+            value={formData.title}
+            onChange={(e) => handleChange("title", e.target.value)}
+            placeholder="Event Title"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Description
+        </label>
+        <textarea
+          value={formData.description}
+          onChange={(e) => handleChange("description", e.target.value)}
+          placeholder="Event Description"
+          className="w-full pl-4 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[80px]"
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Location
+        </label>
+        <input
+          type="text"
+          value={formData.location}
+          onChange={(e) => handleChange("location", e.target.value)}
+          placeholder="Event Location"
+          className="w-full pl-4 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        />
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Start Date
+          </label>
+          <input
+            type="date"
+            value={formData.startDate}
+            onChange={(e) => handleChange("startDate", e.target.value)}
+            className="w-full pl-4 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Start Time
+          </label>
+          <input
+            type="time"
+            value={formData.startTime}
+            onChange={(e) => handleChange("startTime", e.target.value)}
+            className="w-full pl-4 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            End Date
+          </label>
+          <input
+            type="date"
+            value={formData.endDate}
+            onChange={(e) => handleChange("endDate", e.target.value)}
+            className="w-full pl-4 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            End Time
+          </label>
+          <input
+            type="time"
+            value={formData.endTime}
+            onChange={(e) => handleChange("endTime", e.target.value)}
+            className="w-full pl-4 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const SocialMediaForm = ({ value, onChange, platform }) => {
+  const [username, setUsername] = useState("");
+
+  const handleChange = (newUsername) => {
+    setUsername(newUsername);
+    const url = getPlatformUrl(platform, newUsername);
+    onChange(url);
+  };
+
+  const getPlatformUrl = (platform, username) => {
+    switch (platform) {
+      case "instagram":
+        return `https://instagram.com/${username}`;
+      case "facebook":
+        return `https://facebook.com/${username}`;
+      case "youtube":
+        return `https://youtube.com/${username}`;
+      case "tiktok":
+        return `https://tiktok.com/@${username}`;
+      case "linkedin":
+        return `https://linkedin.com/in/${username}`;
+      default:
+        return "";
+    }
+  };
+
+  const getPlatformIcon = () => {
+    switch (platform) {
+      case "instagram":
+        return Instagram;
+      case "facebook":
+        return Facebook;
+      case "youtube":
+        return Youtube;
+      case "tiktok":
+        return Video;
+      case "linkedin":
+        return Linkedin;
+      default:
+        return User;
+    }
+  };
+
+  const Icon = getPlatformIcon();
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          {platform.charAt(0).toUpperCase() + platform.slice(1)} Username
+        </label>
+        <div className="relative">
+          <Icon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => handleChange(e.target.value)}
+            placeholder={`Enter your ${platform} username`}
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const AppStoreForm = ({ value, onChange, platform }) => {
+  const [appId, setAppId] = useState("");
+
+  const handleChange = (newAppId) => {
+    setAppId(newAppId);
+    const url =
+      platform === "ios"
+        ? `https://apps.apple.com/app/id${newAppId}`
+        : `https://play.google.com/store/apps/details?id=${newAppId}`;
+    onChange(url);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          {platform === "ios" ? "App Store" : "Play Store"} App ID
+        </label>
+        <div className="relative">
+          <Store className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <input
+            type="text"
+            value={appId}
+            onChange={(e) => handleChange(e.target.value)}
+            placeholder={platform === "ios" ? "123456789" : "com.example.app"}
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
       </div>
     </div>
   );
@@ -1681,6 +2206,72 @@ const QRGenerator = ({ defaultType }) => {
       icon: Wifi,
       component: WiFiForm,
     },
+    {
+      value: "vcard",
+      label: "vCard",
+      icon: Contact2,
+      component: VCardForm,
+    },
+    {
+      value: "whatsapp",
+      label: "WhatsApp",
+      icon: MessageCircleMore,
+      component: WhatsAppForm,
+    },
+    {
+      value: "paypal",
+      label: "PayPal",
+      icon: CreditCard,
+      component: PayPalForm,
+    },
+    {
+      value: "event",
+      label: "Event",
+      icon: Calendar,
+      component: EventForm,
+    },
+    {
+      value: "youtube",
+      label: "YouTube",
+      icon: Youtube,
+      component: (props) => <SocialMediaForm {...props} platform="youtube" />,
+    },
+    {
+      value: "tiktok",
+      label: "TikTok",
+      icon: Video,
+      component: (props) => <SocialMediaForm {...props} platform="tiktok" />,
+    },
+    {
+      value: "instagram",
+      label: "Instagram",
+      icon: Instagram,
+      component: (props) => <SocialMediaForm {...props} platform="instagram" />,
+    },
+    {
+      value: "facebook",
+      label: "Facebook",
+      icon: Facebook,
+      component: (props) => <SocialMediaForm {...props} platform="facebook" />,
+    },
+    {
+      value: "linkedin",
+      label: "LinkedIn",
+      icon: Linkedin,
+      component: (props) => <SocialMediaForm {...props} platform="linkedin" />,
+    },
+    {
+      value: "appstore",
+      label: "App Store",
+      icon: Store,
+      component: (props) => <AppStoreForm {...props} platform="ios" />,
+    },
+    {
+      value: "playstore",
+      label: "Play Store",
+      icon: Store,
+      component: (props) => <AppStoreForm {...props} platform="android" />,
+    },
   ];
 
   const selectedType = qrTypes.find((type) => type.value === qrType);
@@ -1700,71 +2291,89 @@ const QRGenerator = ({ defaultType }) => {
         <div className="lg:col-span-2 space-y-6">
           {/* QR Code Settings Section */}
           <div className="bg-white rounded-xl shadow-sm">
-            <button
-              onClick={() => toggleSection("qrSettings")}
-              className="w-full px-6 py-4 flex justify-between items-center hover:bg-gray-50"
-            >
+            <div className="px-6 py-4">
               <h2 className="text-xl font-semibold text-gray-800">
                 QR Code Settings
               </h2>
-              <svg
-                className={`w-5 h-5 transform transition-transform ${
-                  sectionsOpen.qrSettings ? "rotate-180" : ""
-                }`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            </button>
-            {sectionsOpen.qrSettings && (
-              <div className="p-6 border-t space-y-6">
-                <div className="space-y-4">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Type
-                  </label>
+            </div>
+            <div className="p-6 border-t">
+              <div className="space-y-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Type
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {qrTypes.slice(0, 3).map((type) => (
+                    <button
+                      key={type.value}
+                      onClick={() => setQrType(type.value)}
+                      className={`flex items-center p-3 rounded-lg border-2 transition-colors ${
+                        qrType === type.value
+                          ? "border-blue-500 bg-blue-50"
+                          : "border-gray-200 hover:border-gray-300"
+                      }`}
+                    >
+                      <type.icon className="w-5 h-5 mr-2 text-gray-400" />
+                      <span className="text-sm font-medium text-gray-700">
+                        {type.label}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+                <button
+                  onClick={() => toggleSection("qrSettings")}
+                  className="text-blue-500 text-sm font-medium hover:text-blue-600 flex items-center mt-2"
+                >
+                  More options
+                  <svg
+                    className={`w-4 h-4 ml-1 transform transition-transform ${
+                      sectionsOpen.qrSettings ? "rotate-180" : ""
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+              </div>
+
+              {sectionsOpen.qrSettings && (
+                <div className="mt-6 space-y-4">
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {qrTypes.map((type) => {
-                      const Icon = type.icon;
-                      return (
-                        <button
-                          key={type.value}
-                          onClick={() => {
-                            setQrType(type.value);
-                            setQrData("");
-                          }}
-                          className={`flex items-center justify-center p-3 rounded-lg border-2 transition-all ${
-                            qrType === type.value
-                              ? "border-blue-500 bg-blue-50 text-blue-600"
-                              : "border-gray-200 hover:border-gray-300 text-gray-600 hover:bg-gray-50"
-                          }`}
-                        >
-                          <Icon className="w-5 h-5 mr-2" />
-                          <span className="text-sm font-medium">
-                            {type.label}
-                          </span>
-                        </button>
-                      );
-                    })}
+                    {qrTypes.slice(3).map((type) => (
+                      <button
+                        key={type.value}
+                        onClick={() => setQrType(type.value)}
+                        className={`flex items-center p-3 rounded-lg border-2 transition-colors ${
+                          qrType === type.value
+                            ? "border-blue-500 bg-blue-50"
+                            : "border-gray-200 hover:border-gray-300"
+                        }`}
+                      >
+                        <type.icon className="w-5 h-5 mr-2 text-gray-400" />
+                        <span className="text-sm font-medium text-gray-700">
+                          {type.label}
+                        </span>
+                      </button>
+                    ))}
                   </div>
                 </div>
+              )}
 
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    {selectedType?.label} Details
-                  </label>
-                  {FormComponent && (
-                    <FormComponent value={qrData} onChange={setQrData} />
-                  )}
-                </div>
+              <div className="mt-6 space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  {selectedType?.label} Details
+                </label>
+                {FormComponent && (
+                  <FormComponent value={qrData} onChange={setQrData} />
+                )}
               </div>
-            )}
+            </div>
           </div>
 
           {/* Style Options Section */}
@@ -2046,14 +2655,108 @@ const Navigation = () => (
       <div className="flex justify-between h-16">
         <Link to="/" className="flex items-center">
           <QrCode className="w-8 h-8 text-blue-500 mr-3" />
-          <div className="text-xl font-bold text-gray-800">
+          <span className="text-xl font-bold text-gray-800">
             QR Code Generator
-          </div>
+          </span>
         </Link>
         <div className="hidden md:flex items-center space-x-8">
           <Link to="/use-cases" className="text-gray-600 hover:text-blue-500">
             Use Cases
           </Link>
+          <div className="relative group">
+            <button className="text-gray-600 hover:text-blue-500 flex items-center">
+              Social Media
+              <svg
+                className="w-4 h-4 ml-1"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+            <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+              <Link
+                to="/generate-free-qr-code-for-instagram"
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                Instagram QR Code
+              </Link>
+              <Link
+                to="/generate-free-qr-code-for-facebook"
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                Facebook QR Code
+              </Link>
+              <Link
+                to="/generate-free-qr-code-for-youtube"
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                YouTube QR Code
+              </Link>
+              <Link
+                to="/generate-free-qr-code-for-tiktok"
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                TikTok QR Code
+              </Link>
+              <Link
+                to="/generate-free-qr-code-for-linkedin"
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                LinkedIn QR Code
+              </Link>
+            </div>
+          </div>
+          <div className="relative group">
+            <button className="text-gray-600 hover:text-blue-500 flex items-center">
+              Business
+              <svg
+                className="w-4 h-4 ml-1"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+            <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+              <Link
+                to="/generate-free-qr-code-for-vcard"
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                vCard QR Code
+              </Link>
+              <Link
+                to="/generate-free-qr-code-for-paypal"
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                PayPal QR Code
+              </Link>
+              <Link
+                to="/generate-free-qr-code-for-whatsapp"
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                WhatsApp QR Code
+              </Link>
+              <Link
+                to="/generate-free-qr-code-for-event"
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                Event QR Code
+              </Link>
+            </div>
+          </div>
           <Link
             to="/generate-free-qr-code-for-url"
             className="text-gray-600 hover:text-blue-500"
@@ -2082,30 +2785,15 @@ const Navigation = () => (
 );
 
 const MainHero = () => (
-  <section className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-20">
+  <section className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-12">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="text-center">
-        <h1 className="text-4xl md:text-5xl font-bold mb-6">
+        <h1 className="text-3xl md:text-4xl font-bold mb-4">
           Create Beautiful QR Codes in Seconds
         </h1>
-        <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
-          Generate customizable QR codes for URLs, text, WiFi, and more. No
-          sign-up required.
+        <p className="text-lg md:text-xl text-blue-100 max-w-2xl mx-auto">
+          Generate customizable QR codes for URLs, text, WiFi, and more
         </p>
-        <div className="flex flex-wrap justify-center gap-4">
-          <a
-            href="#generator"
-            className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
-          >
-            Create QR Code
-          </a>
-          <a
-            href="#features"
-            className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors"
-          >
-            Learn More
-          </a>
-        </div>
       </div>
     </div>
   </section>
@@ -2218,6 +2906,116 @@ const App = () => {
               type="wifi"
               title="Generate Free QR Code for WiFi"
               description="Share your WiFi network details securely with a QR code. Instant connection when scanned."
+            />
+          }
+        />
+        <Route
+          path="/generate-free-qr-code-for-vcard"
+          element={
+            <QRTypeRoute
+              type="vcard"
+              title="Generate Free QR Code for vCard"
+              description="Create a QR code for your contact information that can be instantly saved to phones."
+            />
+          }
+        />
+        <Route
+          path="/generate-free-qr-code-for-whatsapp"
+          element={
+            <QRTypeRoute
+              type="whatsapp"
+              title="Generate Free QR Code for WhatsApp"
+              description="Create a QR code that opens a WhatsApp chat with your number when scanned."
+            />
+          }
+        />
+        <Route
+          path="/generate-free-qr-code-for-paypal"
+          element={
+            <QRTypeRoute
+              type="paypal"
+              title="Generate Free QR Code for PayPal"
+              description="Create a QR code that links directly to your PayPal.me payment page."
+            />
+          }
+        />
+        <Route
+          path="/generate-free-qr-code-for-event"
+          element={
+            <QRTypeRoute
+              type="event"
+              title="Generate Free QR Code for Calendar Event"
+              description="Create a QR code that adds an event to calendar when scanned."
+            />
+          }
+        />
+        <Route
+          path="/generate-free-qr-code-for-youtube"
+          element={
+            <QRTypeRoute
+              type="youtube"
+              title="Generate Free QR Code for YouTube"
+              description="Create a QR code that links to your YouTube channel or video."
+            />
+          }
+        />
+        <Route
+          path="/generate-free-qr-code-for-tiktok"
+          element={
+            <QRTypeRoute
+              type="tiktok"
+              title="Generate Free QR Code for TikTok"
+              description="Create a QR code that links to your TikTok profile or video."
+            />
+          }
+        />
+        <Route
+          path="/generate-free-qr-code-for-instagram"
+          element={
+            <QRTypeRoute
+              type="instagram"
+              title="Generate Free QR Code for Instagram"
+              description="Create a QR code that links to your Instagram profile."
+            />
+          }
+        />
+        <Route
+          path="/generate-free-qr-code-for-facebook"
+          element={
+            <QRTypeRoute
+              type="facebook"
+              title="Generate Free QR Code for Facebook"
+              description="Create a QR code that links to your Facebook profile or page."
+            />
+          }
+        />
+        <Route
+          path="/generate-free-qr-code-for-linkedin"
+          element={
+            <QRTypeRoute
+              type="linkedin"
+              title="Generate Free QR Code for LinkedIn"
+              description="Create a QR code that links to your LinkedIn profile."
+            />
+          }
+        />
+        <Route
+          path="/generate-free-qr-code-for-app-store"
+          element={
+            <QRTypeRoute
+              type="appstore"
+              title="Generate Free QR Code for App Store"
+              description="Create a QR code that links to your iOS app on the App Store."
+            />
+          }
+        />
+        <Route
+          path="/generate-free-qr-code-for-play-store"
+          element={
+            <QRTypeRoute
+              type="playstore"
+              title="Generate Free QR Code for Play Store"
+              description="Create a QR code that links to your Android app on the Play Store."
             />
           }
         />
