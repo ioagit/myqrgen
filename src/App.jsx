@@ -1283,39 +1283,26 @@ const PatternPreview = ({ type, color, size = 32 }) => (
 );
 
 const FramePatternPreview = ({ pattern, color, selected, onClick }) => {
-  const previewStyle = {
-    width: "100%",
-    height: "100%",
-    backgroundColor: "#FFFFFF",
-    position: "relative",
-  };
+  const size = 48; // Default preview size
+  
+  const getFrameStyle = (pattern) => {
+    const baseStyle = {
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      width: '80%',
+      height: '80%',
+      border: `2px ${pattern === 'gradient' ? 'solid' : pattern} ${color}`,
+    };
 
-  const frameStyle = {
-    position: "absolute",
-    inset: "4px",
-    backgroundColor: "#FFFFFF",
-  };
+    if (pattern === 'gradient') {
+      baseStyle.background = `linear-gradient(45deg, ${color}, ${color}88)`;
+      baseStyle.border = 'none';
+    }
 
-  switch (pattern) {
-    case "double":
-      frameStyle.border = `2px double ${color}`;
-      frameStyle.boxShadow = `0 0 0 4px ${color}`;
-      break;
-    case "dashed":
-      frameStyle.border = `2px dashed ${color}`;
-      frameStyle.boxShadow = `0 0 0 4px ${color}`;
-      break;
-    case "dotted":
-      frameStyle.border = `2px dotted ${color}`;
-      frameStyle.boxShadow = `0 0 0 4px ${color}`;
-      break;
-    case "gradient":
-      frameStyle.border = `4px solid ${color}`;
-      frameStyle.background = `linear-gradient(45deg, ${color}22, transparent)`;
-      break;
-    default:
-      frameStyle.border = `4px solid ${color}`;
-  }
+    return baseStyle;
+  };
 
   return (
     <button
@@ -1328,8 +1315,17 @@ const FramePatternPreview = ({ pattern, color, selected, onClick }) => {
     >
       <div className="flex flex-col items-center">
         <div className="w-12 h-12 relative mb-1">
-          <div style={previewStyle}>
-            <div style={frameStyle} className="rounded-lg" />
+          <div 
+            style={{ 
+              width: size, 
+              height: size, 
+              backgroundColor: 'white',
+              border: `1px solid ${color}`,
+              position: 'relative'
+            }} 
+            className="rounded-lg"
+          >
+            <div style={getFrameStyle(pattern)} />
           </div>
         </div>
         <span className="text-xs font-medium text-gray-700 capitalize">
@@ -1693,7 +1689,7 @@ const QRGenerator = ({ defaultType }) => {
   const [qrStyle, setQrStyle] = useState(QRPresets[0].style);
   const [isDownloadOpen, setIsDownloadOpen] = useState(false);
   const [sectionsOpen, setSectionsOpen] = useState({
-    qrSettings: true,
+    qrSettings: false,
     styleOptions: false,
     customOptions: false,
   });
@@ -2580,33 +2576,14 @@ const PresetGrid = ({ presets, selectedPreset, onSelect }) => {
 };
 
 const QRTypeHero = ({ title, description, type }) => {
-  const navigate = useNavigate();
-
   return (
-    <section className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-20">
+    <section className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">{title}</h1>
-          <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">{title}</h1>
+          <p className="text-xl md:text-2xl text-blue-100 mb-4 max-w-3xl mx-auto">
             {description}
           </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <button
-              onClick={() => {
-                const element = document.getElementById("generator");
-                element?.scrollIntoView({ behavior: "smooth" });
-              }}
-              className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
-            >
-              Create QR Code Now
-            </button>
-            <Link
-              to="/"
-              className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors"
-            >
-              View All Types
-            </Link>
-          </div>
         </div>
       </div>
     </section>
@@ -2785,10 +2762,10 @@ const Navigation = () => (
 );
 
 const MainHero = () => (
-  <section className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-12">
+  <section className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-8">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="text-center">
-        <h1 className="text-3xl md:text-4xl font-bold mb-4">
+        <h1 className="text-3xl md:text-4xl font-bold mb-3">
           Create Beautiful QR Codes in Seconds
         </h1>
         <p className="text-lg md:text-xl text-blue-100 max-w-2xl mx-auto">
