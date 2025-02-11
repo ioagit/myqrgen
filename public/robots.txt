@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://myqrgen.com/sitemap.xml
